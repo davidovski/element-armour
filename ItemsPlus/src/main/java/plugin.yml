@@ -1,0 +1,12 @@
+name: ItemsPlus
+main: org.ah.minecraft.items.ItemsPlus
+version: 0.1
+
+
+commands:
+   items:
+      description: items
+      usage: /items
+      permission: 
+      permission-message: You don't have <permission>
+   

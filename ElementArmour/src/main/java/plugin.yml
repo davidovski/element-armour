@@ -1,0 +1,103 @@
+name: ElementArmour
+main: org.ah.minecraft.armour.Plugin
+version: 1.3
+
+
+commands:
+   ElementArmour:
+      description: ElementArmour help
+      usage: /ElementArmour
+      permission: 
+      permission-message: You don't have <permission>
+   Earth:
+      description: Earth
+      usage: /Earth
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Metal:
+      description: Metal
+      usage: /Metal
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Ice:
+      description: Ice
+      usage: /Ice
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Poison:
+      description: Poison
+      usage: /Poison
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Lightning:
+      description: Lightning
+      usage: /Lightning
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Lava:
+      description: Lava
+      usage: /Lava
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Sky:
+      description: Sky
+      usage: /Sky
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Fire:
+      description: Fire
+      usage: /Fire
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Air:
+      description: Air
+      usage: /Air
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Water:
+      description: Water
+      usage: /Water
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   giveColorArmour:
+      description: give Color Armour
+      usage: /giveColorArmour <R> <G> <B>
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Ninja:
+      description: Ninja
+      usage: /Ninja
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Bouncer:
+      description: Bouncer
+      usage: /Bouncer
+      permission: armour.commands
+      permission-message: You don't have <permission> 
+   setMonkeyHead:
+      description: setMonkeyHead
+      usage: /setMonkeyHead
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Shop:
+      description: Shop
+      usage: /Shop
+      permission: armour.commands
+      permission-message: You don't have <permission>   
+   sea:
+      description: sea
+      usage: /sea
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   spawnTower:
+      description: spawnTower
+      usage: /spawnTower
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   
+   
+      
+premissions:
+   armour.commands:
+      description: Allows ops only to acsess these commands.
+      default: op
