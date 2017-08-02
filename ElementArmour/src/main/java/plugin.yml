@@ -1,6 +1,6 @@
 name: ElementArmour
 main: org.ah.minecraft.armour.Plugin
-version: 1.3
+version: 1.4.1
 
 
 commands:
@@ -37,6 +37,11 @@ commands:
    Lava:
       description: Lava
       usage: /Lava
+      permission: armour.commands
+      permission-message: You don't have <permission>
+   Obsidian:
+      description: Obsidian
+      usage: /Obsidian
       permission: armour.commands
       permission-message: You don't have <permission>
    Sky:

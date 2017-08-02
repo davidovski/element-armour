@@ -6,7 +6,6 @@ import java.util.List;
 import org.ah.minecraft.armour.utils.ArmourUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -17,10 +16,8 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
 public class BouncerController extends CustomEntityController {
-
     public BouncerController(int weight) {
         super(weight);
-        // TODO Auto-generated constructor stub
     }
 
     @Override
@@ -28,7 +25,7 @@ public class BouncerController extends CustomEntityController {
         Zombie z = (Zombie) loc.getWorld().spawnEntity(loc, EntityType.ZOMBIE);
         EntityEquipment zomb = z.getEquipment();
         zomb.setBoots(ArmourUtil.createBouncerBoots());
-        zomb.setBootsDropChance(1f);
+        zomb.setBootsDropChance(1.0F);
         zomb.setLeggings(new ItemStack(Material.IRON_LEGGINGS));
         zomb.setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
         zomb.setHelmet(new ItemStack(Material.DIAMOND_HELMET));
@@ -46,32 +43,31 @@ public class BouncerController extends CustomEntityController {
     @Override
     public void update(LivingEntity e) {
         if (e.isOnGround()) {
-            e.setVelocity(e.getLocation().getDirection().setY(1f));
-            e.getWorld().playSound(e.getLocation(), Sound.ENTITY_SLIME_ATTACK, 1, 1);
-            for (Entity n : e.getNearbyEntities(5, 5, 5)) {
-                n.setFallDistance(10f);
+            e.setVelocity(e.getLocation().getDirection().setY(1.0F));
+            e.getWorld().playSound(e.getLocation(), org.bukkit.Sound.ENTITY_SLIME_ATTACK, 1.0F, 1.0F);
+            for (Entity n : e.getNearbyEntities(2.0D, 2.0D, 2.0D)) {
+                n.setFallDistance(10.0F);
                 if (n.getType() == EntityType.ARROW) {
                     ((Arrow) n).setBounce(true);
                 }
             }
         }
-        e.setFallDistance(0f);
+        e.setFallDistance(0.0F);
     }
 
     @Override
     public boolean isOne(LivingEntity e) {
-        return "Bouncer".equals(e.getCustomName()) && e instanceof Zombie;
+        return ("Bouncer".equals(e.getCustomName())) && ((e instanceof Zombie));
     }
 
     @Override
     public List<ItemStack> getDrops() {
-        List<ItemStack> drops = new ArrayList<ItemStack>();
+        List<ItemStack> drops = new ArrayList();
         drops.add(DropGenerator.i(Material.SLIME_BALL, 4));
         drops.add(DropGenerator.i(Material.IRON_INGOT, 4));
-        if (Math.random() > 0.5f) {
+        if (Math.random() > 0.5D) {
             drops.add(ArmourUtil.createBouncerBoots());
         }
         return drops;
     }
-
 }

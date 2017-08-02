@@ -3,12 +3,13 @@ package org.ah.minecraft.armour.mobs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ah.minecraft.armour.utils.ArmourUtil;
 import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -16,10 +17,9 @@ import org.bukkit.util.Vector;
 public class WispController extends CustomEntityController {
     public WispController(int weight) {
         super(weight);
-        // TODO Auto-generated constructor stub
     }
 
-    public long a = 0;
+    public long a = 0L;
 
     @Override
     public boolean canSpawnThere(Block b) {
@@ -28,40 +28,42 @@ public class WispController extends CustomEntityController {
 
     @Override
     public LivingEntity spawn(Location loc) {
-        if (loc.getY() < 64) {
-            Bat bat = (Bat) loc.getWorld().spawnEntity(loc, EntityType.BAT);
+        if (loc.getY() < 64.0D) {
+            Bat bat = (Bat) loc.getWorld().spawnEntity(loc, org.bukkit.entity.EntityType.BAT);
             bat.setCustomName("Wisp");
-            bat.setMaxHealth(30D);
-            bat.setHealth(30D);
-            byte blockData = 0;
-            FallingBlock b = bat.getWorld().spawnFallingBlock(bat.getLocation().add(0, 1.62, 0), Material.GLOWSTONE, blockData);
-            b.setGlowing(true);
-            b.setGravity(false);
-            bat.setPassenger(b);
+            MobUtils.setMaxHealth(bat, 30);
+            bat.setHealth(30.0D);
+            bat.setAwake(true);
+            bat.setGlowing(true);
+            bat.setSilent(true);
             return bat;
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
     public void update(LivingEntity e) {
-        a++;
-        if (a % 4 == 0) {
-            e.getWorld().spawnArrow(e.getLocation().add(0, -0.5D, 0), new Vector(0, -1, 0), 1f, 1f);
+        a += 1L;
+        if (a % 4L == 0L) {
+            if (e.getTicksLived() % 30 == 0) {
+                e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ITEMFRAME_REMOVE_ITEM, 1f, 1f);
+            }
+            Arrow ar = (Arrow) e.getWorld().spawnEntity((e.getLocation().add(0.0D, -0.5D, 0.0D)), EntityType.ARROW);
+            ar.setVelocity(new Vector(0, -1, 0));
+            ar.setShooter(e);
+            ar.setGlowing(true);
         }
     }
 
     @Override
     public boolean isOne(LivingEntity e) {
-        return "Wisp".equalsIgnoreCase(e.getCustomName()) && e instanceof Bat;
+        return ("Wisp".equalsIgnoreCase(e.getCustomName())) && ((e instanceof Bat));
     }
 
     @Override
     public List<ItemStack> getDrops() {
-        List<ItemStack> drops = new ArrayList<ItemStack>();
-        drops.add(DropGenerator.i(Material.RABBIT_HIDE, 2, "Bat Wings"));
+        List<ItemStack> drops = new ArrayList();
+        drops.add(DropGenerator.i(ArmourUtil.createLightEssence(), 2));
         return drops;
     }
-
 }

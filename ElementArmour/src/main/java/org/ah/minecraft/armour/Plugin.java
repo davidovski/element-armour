@@ -1,11 +1,12 @@
 package org.ah.minecraft.armour;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
 import org.ah.minecraft.armour.mobs.BanditController;
@@ -13,19 +14,15 @@ import org.ah.minecraft.armour.mobs.BloodBatController;
 import org.ah.minecraft.armour.mobs.BloodRatController;
 import org.ah.minecraft.armour.mobs.BouncerController;
 import org.ah.minecraft.armour.mobs.ChaserController;
-import org.ah.minecraft.armour.mobs.DeamonController;
 import org.ah.minecraft.armour.mobs.EntityTypeController;
 import org.ah.minecraft.armour.mobs.EyeController;
 import org.ah.minecraft.armour.mobs.GhostController;
 import org.ah.minecraft.armour.mobs.KnightController;
 import org.ah.minecraft.armour.mobs.MinerController;
+import org.ah.minecraft.armour.mobs.MobUtils;
 import org.ah.minecraft.armour.mobs.MonkeyController;
-import org.ah.minecraft.armour.mobs.NetherKnightController;
 import org.ah.minecraft.armour.mobs.RedGuardianController;
 import org.ah.minecraft.armour.mobs.SkeletonFarmerController;
-import org.ah.minecraft.armour.mobs.SkeletonWariorController;
-import org.ah.minecraft.armour.mobs.TrapController;
-import org.ah.minecraft.armour.mobs.UndeathController;
 import org.ah.minecraft.armour.mobs.VampireController;
 import org.ah.minecraft.armour.mobs.WeightedEntityController;
 import org.ah.minecraft.armour.mobs.WispController;
@@ -33,56 +30,72 @@ import org.ah.minecraft.armour.utils.AirUtils;
 import org.ah.minecraft.armour.utils.ArmourUtil;
 import org.ah.minecraft.armour.utils.EarthUtils;
 import org.ah.minecraft.armour.utils.FireUtils;
+import org.ah.minecraft.armour.utils.FreezeUtils;
+import org.ah.minecraft.armour.utils.FrostedBlock;
 import org.ah.minecraft.armour.utils.IceUtils;
 import org.ah.minecraft.armour.utils.LavaUtils;
 import org.ah.minecraft.armour.utils.LightningUtils;
 import org.ah.minecraft.armour.utils.MetalUtils;
+import org.ah.minecraft.armour.utils.ObsidianUtils;
 import org.ah.minecraft.armour.utils.PoisonUtils;
+import org.ah.minecraft.armour.utils.SandUtils;
 import org.ah.minecraft.armour.utils.SkyUtils;
+import org.ah.minecraft.armour.utils.SteamUtils;
 import org.ah.minecraft.armour.utils.WaterUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
 import org.bukkit.Difficulty;
+import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.Dispenser;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.SmallFireball;
+import org.bukkit.entity.Villager;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -90,7 +103,6 @@ import org.bukkit.event.world.ChunkPopulateEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.PluginManager;
@@ -98,19 +110,23 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.util.Vector;
+
+import com.gmail.fedmanddev.VillagerTrade;
+import com.gmail.fedmanddev.VillagerTradeApi;
 
 public final class Plugin extends JavaPlugin implements Listener {
-
-    public static List<String> crafterLocations;
+    public List<String> crafterLocations;
+    public List<String> combinerLocations;
     protected ItemStack monkeySkull;
     private HashMap<Player, FallingBlock> holdingblock;
     public static Player p;
-
     public List<WeightedEntityController> controllers;
     public List<WeightedEntityController> nethercontrollers;
-
     private int maxweight;
     private HashMap<Player, Integer> punchDelay;
+    private BossBar bb;
+    public static List<FrostedBlock> s = new ArrayList<FrostedBlock>();
 
     @Override
     public void onEnable() {
@@ -119,18 +135,19 @@ public final class Plugin extends JavaPlugin implements Listener {
         PluginManager manager = getServer().getPluginManager();
         getServer().getPluginManager().registerEvents(this, this);
 
-        crafterLocations = new ArrayList<String>();
+        crafterLocations = new ArrayList();
+        combinerLocations = new ArrayList();
 
-        holdingblock = new HashMap<Player, FallingBlock>();
-        punchDelay = new HashMap<Player, Integer>();
+        holdingblock = new HashMap();
+        punchDelay = new HashMap();
 
         loadAll(this);
 
-        controllers = new ArrayList<WeightedEntityController>();
-        nethercontrollers = new ArrayList<WeightedEntityController>();
+        controllers = new ArrayList();
+        nethercontrollers = new ArrayList();
         controllers.add(new BanditController(90));
         controllers.add(new BouncerController(40));
-        // controllers.add(new DeathHunterController(160));
+
         controllers.add(new GhostController(60));
         controllers.add(new KnightController(70));
         controllers.add(new BloodBatController(0));
@@ -138,57 +155,56 @@ public final class Plugin extends JavaPlugin implements Listener {
         controllers.add(new RedGuardianController(0));
 
         controllers.add(new MinerController(40));
-        controllers.add(new TrapController(10));
-
+        controllers.add(new org.ah.minecraft.armour.mobs.TrapController(10));
 
         controllers.add(new MonkeyController(140));
         controllers.add(new ChaserController(0));
-        //controllers.add(new BloodBearController(0));
 
         controllers.add(new SkeletonFarmerController(90));
-        controllers.add(new SkeletonWariorController(120));
+        controllers.add(new org.ah.minecraft.armour.mobs.SkeletonWariorController(120));
 
         controllers.add(new VampireController(60));
         controllers.add(new EyeController(40));
 
         controllers.add(new WispController(10));
-        controllers.add(new UndeathController(10));
+        controllers.add(new org.ah.minecraft.armour.mobs.UndeathController(1));
 
-        nethercontrollers.add(new NetherKnightController(70));
-        nethercontrollers.add(new DeamonController(50));
-
+        nethercontrollers.add(new org.ah.minecraft.armour.mobs.NetherKnightController(70));
+        nethercontrollers.add(new org.ah.minecraft.armour.mobs.DeamonController(50));
         setDifficulties();
+
+        // Advancements a = new Advancements(this);
 
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 doEveryTick();
             }
-        }, 1, 1);
+        }, 1L, 1L);
 
         getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 for (World w : Bukkit.getWorlds()) {
+
                     for (LivingEntity e : w.getLivingEntities()) {
 
                         if ("Bow Master".equalsIgnoreCase(e.getCustomName())) {
-                            if (Math.random() > 0.5) {
+                            if (Math.random() > 0.5D) {
                                 for (int i = 0; i < 2; i++) {
-                                    Bat wisp = (Bat) w.spawnEntity(e.getLocation().add(0, 2, 0), EntityType.BAT);
+                                    Bat wisp = (Bat) w.spawnEntity(e.getLocation().add(0.0D, 2.0D, 0.0D), EntityType.BAT);
                                     wisp.setCustomName("Wisp");
                                     wisp.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 10, 10));
                                 }
                             } else {
                                 for (int i = 0; i < 4; i++) {
-                                    for (Entity n : e.getNearbyEntities(10, 10, 10)) {
-                                        if (n instanceof LivingEntity) {
-                                            Arrow a = w.spawnArrow(e.getEyeLocation().add(0, 1, 0), n.getLocation().toVector().add(e.getEyeLocation().add(0, 1, 0).toVector()), 1f,
-                                                    1f);
+                                    for (Entity n : e.getNearbyEntities(10.0D, 10.0D, 10.0D)) {
+                                        if ((n instanceof LivingEntity)) {
+                                            Arrow a = w.spawnArrow(e.getEyeLocation().add(0.0D, 1.0D, 0.0D),
+                                                    n.getLocation().toVector().add(e.getEyeLocation().add(0.0D, 1.0D, 0.0D).toVector()), 1.0F, 1.0F);
                                             a.setShooter(e);
                                             a.setCritical(true);
                                         }
-
                                     }
                                 }
                             }
@@ -196,20 +212,9 @@ public final class Plugin extends JavaPlugin implements Listener {
                     }
                 }
             }
-        }, 300, 300);
+        }
 
-        getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                for (World w : Bukkit.getWorlds()) {
-                    for (LivingEntity e : w.getLivingEntities()) {
-                        if ("Vampire".equalsIgnoreCase(e.getCustomName())) {
-
-                        }
-                    }
-                }
-            }
-        }, 60, 60);
+                , 300L, 300L);
 
     }
 
@@ -222,18 +227,18 @@ public final class Plugin extends JavaPlugin implements Listener {
         int mulitplier = 1;
         Difficulty d = getServer().getWorlds().get(0).getDifficulty();
         if (d == Difficulty.PEACEFUL) {
-            mulitplier = 4;
+            mulitplier = 6;
         } else if (d == Difficulty.EASY) {
-            mulitplier = 3;
+            mulitplier = 5;
         } else if (d == Difficulty.NORMAL) {
-            mulitplier = 2;
+            mulitplier = 4;
         } else if (d == Difficulty.HARD) {
-            mulitplier = 1;
+            mulitplier = 3;
         } else {
             mulitplier = 0;
         }
 
-        maxweight = maxweight * mulitplier;
+        maxweight *= mulitplier;
     }
 
     @Override
@@ -244,7 +249,7 @@ public final class Plugin extends JavaPlugin implements Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (sender instanceof Player) {
+        if ((sender instanceof Player)) {
             Player p = (Player) sender;
             if (cmd.getName().equalsIgnoreCase("difficulty")) {
                 setDifficulties();
@@ -260,158 +265,173 @@ public final class Plugin extends JavaPlugin implements Listener {
                 p.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "======================================");
                 p.sendMessage(ChatColor.BOLD + "Mod creator: andavdor (davidovski)");
                 return true;
-            } else if (cmd.getName().equalsIgnoreCase("Earth")) {
-                p.getInventory().addItem(EarthUtils.createEarthBoots());
-                p.getInventory().addItem(EarthUtils.createEarthHelmet());
-                p.getInventory().addItem(EarthUtils.createEarthChestplate());
-                p.getInventory().addItem(EarthUtils.createEarthLeggings());
+            }
+            if (cmd.getName().equalsIgnoreCase("Earth")) {
+                p.getInventory().addItem(new ItemStack[] { EarthUtils.createEarthBoots() });
+                p.getInventory().addItem(new ItemStack[] { EarthUtils.createEarthHelmet() });
+                p.getInventory().addItem(new ItemStack[] { EarthUtils.createEarthChestplate() });
+                p.getInventory().addItem(new ItemStack[] { EarthUtils.createEarthLeggings() });
                 return true;
-
-            } else if (cmd.getName().equalsIgnoreCase("Metal")) {
-                p.getInventory().addItem(MetalUtils.createMetalBoots());
-                p.getInventory().addItem(MetalUtils.createMetalChestplate());
-                p.getInventory().addItem(MetalUtils.createMetalHelmet());
-                p.getInventory().addItem(MetalUtils.createMetalLeggings());
+            }
+            if (cmd.getName().equalsIgnoreCase("Metal")) {
+                p.getInventory().addItem(new ItemStack[] { MetalUtils.createMetalBoots() });
+                p.getInventory().addItem(new ItemStack[] { MetalUtils.createMetalChestplate() });
+                p.getInventory().addItem(new ItemStack[] { MetalUtils.createMetalHelmet() });
+                p.getInventory().addItem(new ItemStack[] { MetalUtils.createMetalLeggings() });
                 return true;
-
-            } else if (cmd.getName().equalsIgnoreCase("Sky")) {
-                p.getInventory().addItem(SkyUtils.createSkyBoots());
-                p.getInventory().addItem(SkyUtils.createSkyChestplate());
-                p.getInventory().addItem(SkyUtils.createSkyHelmet());
-                p.getInventory().addItem(SkyUtils.createSkyLeggings());
+            }
+            if (cmd.getName().equalsIgnoreCase("Sky")) {
+                p.getInventory().addItem(new ItemStack[] { SkyUtils.createSkyBoots() });
+                p.getInventory().addItem(new ItemStack[] { SkyUtils.createSkyChestplate() });
+                p.getInventory().addItem(new ItemStack[] { SkyUtils.createSkyHelmet() });
+                p.getInventory().addItem(new ItemStack[] { SkyUtils.createSkyLeggings() });
                 return true;
-
-            } else if (cmd.getName().equalsIgnoreCase("Lava")) {
-                p.getInventory().addItem(LavaUtils.createLavaBoots());
-                p.getInventory().addItem(LavaUtils.createLavaChestplate());
-                p.getInventory().addItem(LavaUtils.createLavaHelmet());
-                p.getInventory().addItem(LavaUtils.createLavaLeggings());
+            }
+            if (cmd.getName().equalsIgnoreCase("Obsidian")) {
+                p.getInventory().addItem(new ItemStack[] { ObsidianUtils.createBoots() });
+                p.getInventory().addItem(new ItemStack[] { ObsidianUtils.createChestplate() });
+                p.getInventory().addItem(new ItemStack[] { ObsidianUtils.createHelmet() });
+                p.getInventory().addItem(new ItemStack[] { ObsidianUtils.createLeggings() });
                 return true;
-
-            } else if (cmd.getName().equalsIgnoreCase("Ice")) {
-                p.getInventory().addItem(IceUtils.createIceBoots());
-                p.getInventory().addItem(IceUtils.createIceChestplate());
-                p.getInventory().addItem(IceUtils.createIceHelmet());
-                p.getInventory().addItem(IceUtils.createIceLeggings());
+            }
+            if (cmd.getName().equalsIgnoreCase("Lava")) {
+                p.getInventory().addItem(new ItemStack[] { LavaUtils.createLavaBoots() });
+                p.getInventory().addItem(new ItemStack[] { LavaUtils.createLavaChestplate() });
+                p.getInventory().addItem(new ItemStack[] { LavaUtils.createLavaHelmet() });
+                p.getInventory().addItem(new ItemStack[] { LavaUtils.createLavaLeggings() });
                 return true;
-
-            } else if (cmd.getName().equalsIgnoreCase("Poison")) {
-                p.getInventory().addItem(PoisonUtils.createBoots());
-                p.getInventory().addItem(PoisonUtils.createChestplate());
-                p.getInventory().addItem(PoisonUtils.createHelmet());
-                p.getInventory().addItem(PoisonUtils.createLeggings());
+            }
+            if (cmd.getName().equalsIgnoreCase("Ice")) {
+                p.getInventory().addItem(new ItemStack[] { IceUtils.createIceBoots() });
+                p.getInventory().addItem(new ItemStack[] { IceUtils.createIceChestplate() });
+                p.getInventory().addItem(new ItemStack[] { IceUtils.createIceHelmet() });
+                p.getInventory().addItem(new ItemStack[] { IceUtils.createIceLeggings() });
                 return true;
-
-            } else if (cmd.getName().equalsIgnoreCase("Lightning")) {
-                p.getInventory().addItem(LightningUtils.createBoots());
-                p.getInventory().addItem(LightningUtils.createChestplate());
-                p.getInventory().addItem(LightningUtils.createHelmet());
-                p.getInventory().addItem(LightningUtils.createLeggings());
+            }
+            if (cmd.getName().equalsIgnoreCase("Poison")) {
+                p.getInventory().addItem(new ItemStack[] { PoisonUtils.createBoots() });
+                p.getInventory().addItem(new ItemStack[] { PoisonUtils.createChestplate() });
+                p.getInventory().addItem(new ItemStack[] { PoisonUtils.createHelmet() });
+                p.getInventory().addItem(new ItemStack[] { PoisonUtils.createLeggings() });
                 return true;
-
-//            } else if (cmd.getName().equalsIgnoreCase("Poison")) {
-//                p.getInventory().addItem(PoisonUtils.createBoots());
-//                p.getInventory().addItem(PoisonUtils.createChestplate());
-//                p.getInventory().addItem(PoisonUtils.createHelmet());
-//                p.getInventory().addItem(PoisonUtils.createLeggings());
-//                return true;
-//
-//            } else if (cmd.getName().equalsIgnoreCase("Poison")) {
-//                p.getInventory().addItem(PoisonUtils.createBoots());
-//                p.getInventory().addItem(PoisonUtils.createChestplate());
-//                p.getInventory().addItem(PoisonUtils.createHelmet());
-//                p.getInventory().addItem(PoisonUtils.createLeggings());
-//                return true;
-//
-//            } else if (cmd.getName().equalsIgnoreCase("Poison")) {
-//                p.getInventory().addItem(PoisonUtils.createBoots());
-//                p.getInventory().addItem(PoisonUtils.createChestplate());
-//                p.getInventory().addItem(PoisonUtils.createHelmet());
-//                p.getInventory().addItem(PoisonUtils.createLeggings());
-//                return true;
-//
-//            } else if (cmd.getName().equalsIgnoreCase("Poison")) {
-//                p.getInventory().addItem(PoisonUtils.createBoots());
-//                p.getInventory().addItem(PoisonUtils.createChestplate());
-//                p.getInventory().addItem(PoisonUtils.createHelmet());
-//                p.getInventory().addItem(PoisonUtils.createLeggings());
-//                return true;
-
-            } else if (cmd.getName().equalsIgnoreCase("Shop")) {
-                MerchantInventory inv = (MerchantInventory) getServer().createInventory(p, InventoryType.MERCHANT);
-
-                p.openInventory(inv);
-            } else if (cmd.getName().equalsIgnoreCase("sea")) {
-                // createSeaHouse(p.getLocation().getBlock());
-            } else if (cmd.getName().equalsIgnoreCase("spawnTower")) {
-                createTower(p.getLocation().getBlock());
-            } else if (cmd.getName().equalsIgnoreCase("Fire")) {
-                p.getInventory().addItem(FireUtils.createFireBoots());
-                p.getInventory().addItem(FireUtils.createFireHelmet());
-                p.getInventory().addItem(FireUtils.createFireChestplate());
-                p.getInventory().addItem(FireUtils.createFireLeggings());
+            }
+            if (cmd.getName().equalsIgnoreCase("Freeze")) {
+                p.getInventory().addItem(new ItemStack[] { FreezeUtils.createBoots() });
+                p.getInventory().addItem(new ItemStack[] { FreezeUtils.createChestplate() });
+                p.getInventory().addItem(new ItemStack[] { FreezeUtils.createHelmet() });
+                p.getInventory().addItem(new ItemStack[] { FreezeUtils.createLeggings() });
                 return true;
-            } else if (cmd.getName().equalsIgnoreCase("Air")) {
-                p.getInventory().addItem(AirUtils.createAirBoots());
-                p.getInventory().addItem(AirUtils.createAirHelmet());
-                p.getInventory().addItem(AirUtils.createAirChestplate());
-                p.getInventory().addItem(AirUtils.createAirLeggings());
+            }
+            if (cmd.getName().equalsIgnoreCase("Sand")) {
+                p.getInventory().addItem(new ItemStack[] { SandUtils.createBoots() });
+                p.getInventory().addItem(new ItemStack[] { SandUtils.createChestplate() });
+                p.getInventory().addItem(new ItemStack[] { SandUtils.createHelmet() });
+                p.getInventory().addItem(new ItemStack[] { SandUtils.createLeggings() });
                 return true;
-            } else if (cmd.getName().equalsIgnoreCase("Water")) {
-                p.getInventory().addItem(WaterUtils.createWaterBoots());
-                p.getInventory().addItem(WaterUtils.createWaterHelmet());
-                p.getInventory().addItem(WaterUtils.createWaterChestplate());
-                p.getInventory().addItem(WaterUtils.createWaterLeggings());
+            }
+            if (cmd.getName().equalsIgnoreCase("Lightning")) {
+                p.getInventory().addItem(new ItemStack[] { LightningUtils.createBoots() });
+                p.getInventory().addItem(new ItemStack[] { LightningUtils.createChestplate() });
+                p.getInventory().addItem(new ItemStack[] { LightningUtils.createHelmet() });
+                p.getInventory().addItem(new ItemStack[] { LightningUtils.createLeggings() });
                 return true;
-            } else if (cmd.getName().equalsIgnoreCase("Ninja")) {
-                p.getInventory().addItem(Ninja.createShurikenItemStack());
-                p.getInventory().addItem(ArmourUtil.createWarpBow());
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("Bouncer")) {
-                p.getInventory().addItem(ArmourUtil.createBouncerBoots());
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("setMonkeyHead")) {
-                monkeySkull = new ItemStack(p.getItemInHand());
-                saveAll(this);
-                return true;
-            } else if (cmd.getName().equalsIgnoreCase("giveColorArmour")) {
-                if (args.length > 0 && args.length < 4) {
-                    int r = Integer.parseInt(args[0]);
-                    int g = Integer.parseInt(args[1]);
-                    int b = Integer.parseInt(args[2]);
-                    Inventory inv = p.getInventory();
-
-                    ItemStack head = new ItemStack(Material.LEATHER_HELMET);
-                    LeatherArmorMeta hmeta = (LeatherArmorMeta) head.getItemMeta();
-                    hmeta.setColor(Color.fromRGB(r, g, b));
-                    head.setItemMeta(hmeta);
-
-                    ItemStack body = new ItemStack(Material.LEATHER_CHESTPLATE);
-                    LeatherArmorMeta bmeta = (LeatherArmorMeta) body.getItemMeta();
-                    bmeta.setColor(Color.fromRGB(r, g, b));
-                    body.setItemMeta(bmeta);
-
-                    ItemStack legs = new ItemStack(Material.LEATHER_LEGGINGS);
-                    LeatherArmorMeta lmeta = (LeatherArmorMeta) legs.getItemMeta();
-                    lmeta.setColor(Color.fromRGB(r, g, b));
-                    legs.setItemMeta(lmeta);
-
-                    ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
-                    LeatherArmorMeta bometa = (LeatherArmorMeta) boots.getItemMeta();
-                    bometa.setColor(Color.fromRGB(r, g, b));
-                    boots.setItemMeta(bometa);
-
-                    inv.addItem(head);
-                    inv.addItem(body);
-                    inv.addItem(legs);
-                    inv.addItem(boots);
-
-                    return true;
-                } else {
-                    return false;
-                }
             }
 
+            if (cmd.getName().equalsIgnoreCase("Shop")) {
+                ItemStack i = new ItemStack(Material.EMERALD, 3); // Creating the input itemstack
+                ItemStack out = new ItemStack(Material.PAPER, 2); // Creating output itemstack
+                ItemMeta im = out.getItemMeta();// adding some fancy meta :3
+                im.setDisplayName(ChatColor.GREEN + "Special Paper");
+                im.setLore(Arrays.asList(ChatColor.GOLD + "Magic paper! WOOSH!"));
+                out.setItemMeta(im);
+
+
+                Villager vil = (Villager) p.getLocation().getWorld().spawnEntity(p.getLocation(), EntityType.VILLAGER);
+                VillagerTradeApi.clearTrades(vil);
+                VillagerTrade trade = new VillagerTrade(i, null, out);
+                VillagerTradeApi.addTrade(vil, trade);
+
+
+
+            } else if (!cmd.getName().equalsIgnoreCase("sea")) {
+                if (cmd.getName().equalsIgnoreCase("spawnTower")) {
+                    createTower(p.getLocation().getBlock());
+                } else {
+                    if (cmd.getName().equalsIgnoreCase("Fire")) {
+                        p.getInventory().addItem(new ItemStack[] { FireUtils.createFireBoots() });
+                        p.getInventory().addItem(new ItemStack[] { FireUtils.createFireHelmet() });
+                        p.getInventory().addItem(new ItemStack[] { FireUtils.createFireChestplate() });
+                        p.getInventory().addItem(new ItemStack[] { FireUtils.createFireLeggings() });
+                        return true;
+                    }
+                    if (cmd.getName().equalsIgnoreCase("Air")) {
+                        p.getInventory().addItem(new ItemStack[] { AirUtils.createAirBoots() });
+                        p.getInventory().addItem(new ItemStack[] { AirUtils.createAirHelmet() });
+                        p.getInventory().addItem(new ItemStack[] { AirUtils.createAirChestplate() });
+                        p.getInventory().addItem(new ItemStack[] { AirUtils.createAirLeggings() });
+                        return true;
+                    }
+                    if (cmd.getName().equalsIgnoreCase("Water")) {
+                        p.getInventory().addItem(new ItemStack[] { WaterUtils.createWaterBoots() });
+                        p.getInventory().addItem(new ItemStack[] { WaterUtils.createWaterHelmet() });
+                        p.getInventory().addItem(new ItemStack[] { WaterUtils.createWaterChestplate() });
+                        p.getInventory().addItem(new ItemStack[] { WaterUtils.createWaterLeggings() });
+                        return true;
+                    }
+                    if (cmd.getName().equalsIgnoreCase("Ninja")) {
+                        p.getInventory().addItem(new ItemStack[] { Ninja.createShurikenItemStack() });
+                        p.getInventory().addItem(new ItemStack[] { ArmourUtil.createDarkEssence() });
+                        p.getInventory().addItem(new ItemStack[] { ArmourUtil.createLightEssence() });
+                        p.getAdvancementProgress(Bukkit.getAdvancement(new NamespacedKey(this, "elementArmour/must_rewawrd"))).awardCriteria("do");
+                        return true;
+                    }
+                    if (cmd.getName().equalsIgnoreCase("Bouncer")) {
+                        p.getInventory().addItem(new ItemStack[] { ArmourUtil.createBouncerBoots() });
+                        return true;
+                    }
+                    if (cmd.getName().equalsIgnoreCase("setMonkeyHead")) {
+                        monkeySkull = new ItemStack(p.getItemInHand());
+                        saveAll(this);
+                        return true;
+                    }
+                    if (cmd.getName().equalsIgnoreCase("giveColorArmour")) {
+                        if ((args.length > 0) && (args.length < 4)) {
+                            int r = Integer.parseInt(args[0]);
+                            int g = Integer.parseInt(args[1]);
+                            int b = Integer.parseInt(args[2]);
+                            Inventory inv = p.getInventory();
+
+                            ItemStack head = new ItemStack(Material.LEATHER_HELMET);
+                            LeatherArmorMeta hmeta = (LeatherArmorMeta) head.getItemMeta();
+                            hmeta.setColor(Color.fromRGB(r, g, b));
+                            head.setItemMeta(hmeta);
+
+                            ItemStack body = new ItemStack(Material.LEATHER_CHESTPLATE);
+                            LeatherArmorMeta bmeta = (LeatherArmorMeta) body.getItemMeta();
+                            bmeta.setColor(Color.fromRGB(r, g, b));
+                            body.setItemMeta(bmeta);
+
+                            ItemStack legs = new ItemStack(Material.LEATHER_LEGGINGS);
+                            LeatherArmorMeta lmeta = (LeatherArmorMeta) legs.getItemMeta();
+                            lmeta.setColor(Color.fromRGB(r, g, b));
+                            legs.setItemMeta(lmeta);
+
+                            ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
+                            LeatherArmorMeta bometa = (LeatherArmorMeta) boots.getItemMeta();
+                            bometa.setColor(Color.fromRGB(r, g, b));
+                            boots.setItemMeta(bometa);
+
+                            inv.addItem(new ItemStack[] { head });
+                            inv.addItem(new ItemStack[] { body });
+                            inv.addItem(new ItemStack[] { legs });
+                            inv.addItem(new ItemStack[] { boots });
+
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+            }
         }
 
         return false;
@@ -420,30 +440,9 @@ public final class Plugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player p = event.getPlayer();
-        if (!p.hasPlayedBefore()) {
-            if (getServer().getOperators().isEmpty()) {
-                p.setOp(true);
-            }
+        if ((!p.hasPlayedBefore()) && (getServer().getOperators().isEmpty())) {
+            p.setOp(true);
         }
-        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 10, 1f);
-        Bukkit.getScheduler().runTaskLater(this, new Runnable() {
-            @Override
-            public void run() {
-                for (Player p : getServer().getOnlinePlayers()) {
-                    p.getWorld().playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 10, 0.5f);
-                }
-
-            }
-        }, 20);
-        Bukkit.getScheduler().runTaskLater(this, new Runnable() {
-            @Override
-            public void run() {
-                for (Player p : getServer().getOnlinePlayers()) {
-                    p.getWorld().playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 10, 0.5f);
-                }
-            }
-        }, 40);
-
     }
 
     @EventHandler
@@ -451,16 +450,16 @@ public final class Plugin extends JavaPlugin implements Listener {
         if (event.getEntity().getType() == EntityType.ARROW) {
             Arrow a = (Arrow) event.getEntity();
             ProjectileSource shooter = a.getShooter();
-            if (shooter instanceof Player) {
+            if ((shooter instanceof Player)) {
                 Player p = (Player) shooter;
                 if (ArmourUtil.checkHoldingWarpBow(p)) {
                     p.teleport(new Location(a.getWorld(), a.getLocation().getX(), a.getLocation().getY(), a.getLocation().getZ()));
                     a.remove();
-                    p.getInventory().addItem(new ItemStack(Material.ARROW));
-
+                    p.getInventory().addItem(new ItemStack[] { new ItemStack(Material.ARROW) });
                 }
             }
-            if (shooter instanceof Skeleton) {
+
+            if ((shooter instanceof Skeleton)) {
                 Skeleton s = (Skeleton) shooter;
                 if ("Bow Master".equals(s.getCustomName())) {
                     a.remove();
@@ -471,110 +470,147 @@ public final class Plugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onShoot(ProjectileLaunchEvent event) {
-
-        if (event.getEntity() instanceof Arrow) {
+        if ((event.getEntity() instanceof Arrow)) {
             Arrow a = (Arrow) event.getEntity();
-            if (a.getShooter() instanceof Skeleton) {
+            if ((a.getShooter() instanceof Skeleton)) {
                 Skeleton s = (Skeleton) a.getShooter();
                 if ("Bow Master".equals(s.getCustomName())) {
-
+                    a.setCritical(true);
                 }
             }
         }
     }
 
     @EventHandler
+    public void onPlayerInteractEntity(PlayerInteractAtEntityEvent event) {
+        FreezeUtils.onPlayerInteractEntity(event, this);
+    }
+
+    public static void hakaiOutToChat(String message) {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            p.playSound(p.getLocation(), Sound.ENTITY_CAT_PURR, 1.0F, 1.0F);
+            p.playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
+            p.sendMessage(ChatColor.BLACK + "<" + ChatColor.BOLD + ChatColor.DARK_RED + "Hakai" + ChatColor.RESET + ChatColor.BLACK + "> " + ChatColor.RED + message);
+        }
+    }
+
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player p = event.getPlayer();
+        ObsidianUtils.onClick(event);
+        MetalUtils.onClick(event);
+        IceUtils.onClick(event);
+        LavaUtils.onClick(event);
 
-        if (p.getItemInHand().getType() == Material.FLINT_AND_STEEL && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-
+        if ((p.getItemInHand().getType() == Material.FLINT_AND_STEEL) && (event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
             Block bl = event.getClickedBlock();
             if (bl.getType() == Material.NETHERRACK) {
                 getLogger().info("lit a block");
-                List<Block> lapis = new ArrayList<Block>();
-                lapis.add(bl.getLocation().add(2, 0, 0).getBlock());
-                lapis.add(bl.getLocation().add(2, 0, 1).getBlock());
-                lapis.add(bl.getLocation().add(2, 0, -1).getBlock());
+                List<Block> glowstone = new ArrayList();
+                glowstone.add(bl.getLocation().add(2.0D, 0.0D, 0.0D).getBlock());
+                glowstone.add(bl.getLocation().add(2.0D, 0.0D, 1.0D).getBlock());
+                glowstone.add(bl.getLocation().add(2.0D, 0.0D, -1.0D).getBlock());
 
-                lapis.add(bl.getLocation().add(-1, 0, 2).getBlock());
-                lapis.add(bl.getLocation().add(0, 0, 2).getBlock());
-                lapis.add(bl.getLocation().add(1, 0, 2).getBlock());
+                glowstone.add(bl.getLocation().add(-1.0D, 0.0D, 2.0D).getBlock());
+                glowstone.add(bl.getLocation().add(0.0D, 0.0D, 2.0D).getBlock());
+                glowstone.add(bl.getLocation().add(1.0D, 0.0D, 2.0D).getBlock());
 
-                lapis.add(bl.getLocation().add(-1, 0, -2).getBlock());
-                lapis.add(bl.getLocation().add(0, 0, -2).getBlock());
-                lapis.add(bl.getLocation().add(-1, 0, -2).getBlock());
+                glowstone.add(bl.getLocation().add(-1.0D, 0.0D, -2.0D).getBlock());
+                glowstone.add(bl.getLocation().add(0.0D, 0.0D, -2.0D).getBlock());
+                glowstone.add(bl.getLocation().add(1.0D, 0.0D, -2.0D).getBlock());
 
-                lapis.add(bl.getLocation().add(-2, 0, 0).getBlock());
-                lapis.add(bl.getLocation().add(-2, 0, 1).getBlock());
-                lapis.add(bl.getLocation().add(-2, 0, -1).getBlock());
+                glowstone.add(bl.getLocation().add(-2.0D, 0.0D, 0.0D).getBlock());
+                glowstone.add(bl.getLocation().add(-2.0D, 0.0D, 1.0D).getBlock());
+                glowstone.add(bl.getLocation().add(-2.0D, 0.0D, -1.0D).getBlock());
 
-                if (areAllOneType(Material.LAPIS_BLOCK, lapis)) {
+                if (areAllOneType(Material.GLOWSTONE, glowstone)) {
                     getLogger().info("has lapis!");
-                    List<Block> glowstone = new ArrayList<Block>();
-                    glowstone.add(bl.getLocation().add(-1, 0, 1).getBlock());
-                    glowstone.add(bl.getLocation().add(0, 0, 1).getBlock());
-                    glowstone.add(bl.getLocation().add(1, 0, 1).getBlock());
+                    List<Block> lapiss = new ArrayList();
+                    lapiss.add(bl.getLocation().add(-1.0D, 0.0D, 1.0D).getBlock());
+                    lapiss.add(bl.getLocation().add(0.0D, 0.0D, 1.0D).getBlock());
+                    lapiss.add(bl.getLocation().add(1.0D, 0.0D, 1.0D).getBlock());
 
-                    glowstone.add(bl.getLocation().add(-1, 0, 0).getBlock());
-                    glowstone.add(bl.getLocation().add(1, 0, 0).getBlock());
+                    lapiss.add(bl.getLocation().add(-1.0D, 0.0D, 0.0D).getBlock());
+                    lapiss.add(bl.getLocation().add(1.0D, 0.0D, 0.0D).getBlock());
 
-                    glowstone.add(bl.getLocation().add(-1, 0, -1).getBlock());
-                    glowstone.add(bl.getLocation().add(0, 0, -1).getBlock());
-                    glowstone.add(bl.getLocation().add(1, 0, -1).getBlock());
+                    lapiss.add(bl.getLocation().add(-1.0D, 0.0D, -1.0D).getBlock());
+                    lapiss.add(bl.getLocation().add(0.0D, 0.0D, -1.0D).getBlock());
+                    lapiss.add(bl.getLocation().add(1.0D, 0.0D, -1.0D).getBlock());
 
-                    if (areAllOneType(Material.GLOWSTONE, glowstone)) {
+                    if (areAllOneType(Material.LAPIS_BLOCK, lapiss)) {
                         getLogger().info("has glowstone!");
-                        List<Block> wood = new ArrayList<Block>();
-                        wood.add(bl.getLocation().add(-2, 1, -2).getBlock());
-                        wood.add(bl.getLocation().add(-2, 2, -2).getBlock());
+                        List<Block> wood = new ArrayList();
+                        wood.add(bl.getLocation().add(-2.0D, 1.0D, -2.0D).getBlock());
+                        wood.add(bl.getLocation().add(-2.0D, 2.0D, -2.0D).getBlock());
 
-                        wood.add(bl.getLocation().add(2, 1, -2).getBlock());
-                        wood.add(bl.getLocation().add(2, 2, -2).getBlock());
+                        wood.add(bl.getLocation().add(2.0D, 1.0D, -2.0D).getBlock());
+                        wood.add(bl.getLocation().add(2.0D, 2.0D, -2.0D).getBlock());
 
-                        wood.add(bl.getLocation().add(-2, 1, 2).getBlock());
-                        wood.add(bl.getLocation().add(-2, 2, 2).getBlock());
+                        wood.add(bl.getLocation().add(-2.0D, 1.0D, 2.0D).getBlock());
+                        wood.add(bl.getLocation().add(-2.0D, 2.0D, 2.0D).getBlock());
 
-                        wood.add(bl.getLocation().add(2, 1, 2).getBlock());
-                        wood.add(bl.getLocation().add(2, 2, 2).getBlock());
+                        wood.add(bl.getLocation().add(2.0D, 1.0D, 2.0D).getBlock());
+                        wood.add(bl.getLocation().add(2.0D, 2.0D, 2.0D).getBlock());
 
                         if (areAllOneType(Material.LOG, wood)) {
                             getLogger().info("has wood!");
-                            bl.getWorld().playSound(bl.getLocation(), Sound.ENTITY_FIREWORK_LARGE_BLAST, 2f, 1);
-                            Block fire = bl.getLocation().add(0, 1, 0).getBlock();
+                            bl.getWorld().playSound(bl.getLocation(), Sound.ENTITY_FIREWORK_LARGE_BLAST, 2.0F, 1.0F);
+                            Block fire = bl.getLocation().add(0.0D, 1.0D, 0.0D).getBlock();
                             fire.setType(Material.AIR);
 
-                            Block crafter = bl.getLocation().getBlock();
+                            Block crafter = bl.getLocation().add(0.0D, 1.0D, 0.0D).getBlock();
                             crafter.setType(Material.DISPENSER);
-
-                            // org.bukkit.material.Dispenser dispenserMat = (org.bukkit.material.Dispenser) crafter.getState();
-                            // dispenserMat.setFacingDirection(BlockFace.UP);
 
                             Dispenser dispenser = (Dispenser) crafter.getState();
                             Inventory inventory = dispenser.getInventory();
-                            dispenser.setCustomName("Crafter");
+                            dispenser.setCustomName("Elemental Crafter");
                             inventory.setItem(4, new ItemStack(Material.DIAMOND));
 
                             crafterLocations.add(LocationUtil.locationToString(crafter.getLocation()));
+
                             saveAll(this);
 
                             bl.getWorld().strikeLightningEffect(bl.getLocation());
-                            bl.getWorld().spawnEntity(bl.getLocation().add(2, 2, 2), EntityType.THROWN_EXP_BOTTLE);
-                            bl.getWorld().spawnEntity(bl.getLocation().add(-2, 2, 2), EntityType.THROWN_EXP_BOTTLE);
-                            bl.getWorld().spawnEntity(bl.getLocation().add(2, 2, -2), EntityType.THROWN_EXP_BOTTLE);
-                            bl.getWorld().spawnEntity(bl.getLocation().add(-2, 2, -2), EntityType.THROWN_EXP_BOTTLE);
+                            bl.getWorld().spawnEntity(bl.getLocation().add(2.0D, 2.0D, 2.0D), EntityType.THROWN_EXP_BOTTLE);
+                            bl.getWorld().spawnEntity(bl.getLocation().add(-2.0D, 2.0D, 2.0D), EntityType.THROWN_EXP_BOTTLE);
+                            bl.getWorld().spawnEntity(bl.getLocation().add(2.0D, 2.0D, -2.0D), EntityType.THROWN_EXP_BOTTLE);
+                            bl.getWorld().spawnEntity(bl.getLocation().add(-2.0D, 2.0D, -2.0D), EntityType.THROWN_EXP_BOTTLE);
+                            crafter.getWorld().createExplosion(crafter.getX(), crafter.getY(), crafter.getZ(), 3.0F, false, false);
+                            for (Block b : glowstone) {
+                                Block block = b.getLocation().add(0.0D, 1.0D, 0.0D).getBlock();
+                                block.setType(Material.STEP);
+                                block.setData((byte) 6);
+                            }
 
+                            for (Block b : lapiss) {
+                                Block block = b.getLocation().add(0.0D, 1.0D, 0.0D).getBlock();
+                                block.setType(Material.STEP);
+                                block.setData((byte) 6);
+
+                                b.setType(Material.STONE);
+                            }
+
+                            crafter.getLocation().add(1.0D, 0.0D, 0.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+                            crafter.getLocation().add(-1.0D, 0.0D, 0.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+                            crafter.getLocation().add(0.0D, 0.0D, 1.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+                            crafter.getLocation().add(0.0D, 0.0D, -1.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+
+                            crafter.getLocation().add(1.0D, 0.0D, 0.0D).getBlock().setData((byte) 1);
+                            crafter.getLocation().add(-1.0D, 0.0D, 0.0D).getBlock().setData((byte) 0);
+                            crafter.getLocation().add(0.0D, 0.0D, 1.0D).getBlock().setData((byte) 3);
+                            crafter.getLocation().add(0.0D, 0.0D, -1.0D).getBlock().setData((byte) 2);
+
+                            for (Block b : wood) {
+                                b.setType(Material.AIR);
+                            }
                         }
-
                     }
                 }
-
             }
         }
 
         if (p.getItemInHand().getType() == Material.AIR) {
-
-            if ( !punchDelay.containsKey(p) || punchDelay.get(p) < 0 ) {
+            if ((!punchDelay.containsKey(p)) || (punchDelay.get(p).intValue() < 0)) {
                 if (event.getAction() == Action.LEFT_CLICK_AIR) {
                     EarthUtils.checkPunch(p);
                     WaterUtils.checkPunch(p);
@@ -583,193 +619,377 @@ public final class Plugin extends JavaPlugin implements Listener {
                     IceUtils.checkPunch(p);
                     LavaUtils.checkPunch(p);
                     PoisonUtils.checkPunch(p);
-
-
-                    punchDelay.put(p, 5);
-
+                    ObsidianUtils.checkPunch(p);
+                    punchDelay.put(p, Integer.valueOf(5));
                 }
-                if (event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.LEFT_CLICK_AIR) {
+
+                if ((event.getAction() == Action.LEFT_CLICK_BLOCK) || (event.getAction() == Action.LEFT_CLICK_AIR)) {
+                    punchDelay.put(p, Integer.valueOf(10));
                     MetalUtils.checkPunch(p);
-                    punchDelay.put(p, 10);
                     LightningUtils.checkPunch(p);
                     AirUtils.checkPunch(p);
-
-
                 }
             }
 
             if (EarthUtils.checkForHelmet(p)) {
-                if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == Material.STONE) {
+                if ((event.getAction() == Action.RIGHT_CLICK_BLOCK) && (event.getClickedBlock().getType() == Material.STONE)) {
                     Block block = event.getClickedBlock();
                     block.setType(Material.AIR);
-                    Byte blockData = 0x0;
-                    FallingBlock b = p.getWorld().spawnFallingBlock(p.getLocation().add(0, 1.62, 0), Material.STONE, blockData);
+                    Byte blockData = Byte.valueOf((byte) 5);
+                    FallingBlock b = p.getWorld().spawnFallingBlock(p.getLocation().add(0.0D, 1.62D, 0.0D), Material.STONE, blockData.byteValue());
                     holdingblock.put(p, b);
                     b.setGravity(false);
-
                 }
 
-                if (event.getAction() == Action.LEFT_CLICK_AIR) {
-                    if (holdingblock.containsKey(p)) {
-                        holdingblock.get(p).setGravity(true);
-                        holdingblock.get(p).setVelocity(p.getLocation().getDirection().multiply(2));
-                        holdingblock.remove(p);
-
-                    }
-                    p.sendMessage("Drop");
+                if ((event.getAction() == Action.LEFT_CLICK_AIR) && (holdingblock.containsKey(p))) {
+                    holdingblock.get(p).setGravity(true);
+                    holdingblock.get(p).setVelocity(p.getLocation().getDirection().multiply(2));
+                    holdingblock.remove(p);
                 }
             }
         }
-    }
-
-    @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        Player p = event.getPlayer();
-
     }
 
     @EventHandler
     public void onBlockFall(EntityChangeBlockEvent event) {
         Entity e = event.getEntity();
-        if ((event.getEntityType() == EntityType.FALLING_BLOCK) && !holdingblock.keySet().contains(e) && e.getVelocity().length() > 1) {
-            Byte blockData = 0x5;
-            if (((FallingBlock) e).getBlockData() == blockData) {
+        if ((event.getEntityType() == EntityType.FALLING_BLOCK) && (!holdingblock.containsValue(e))) {
+            Byte blockData = Byte.valueOf((byte) 5);
+            if (((FallingBlock) e).getBlockData() == blockData.byteValue()) {
                 event.setCancelled(true);
                 Location explosion = e.getLocation();
                 World w = explosion.getWorld();
-                w.createExplosion(explosion.getX(), explosion.getY(), explosion.getZ(), 5F, false, false);
-                w.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, -4, 12);
+                w.createExplosion(explosion.getX(), explosion.getY(), explosion.getZ(), 5.0F, false, false);
+                w.playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, -4.0F, 12.0F);
             }
         }
     }
 
     public void doEveryTick() {
-
         CraftingUtil.crafterCheck(this);
+        CombiningUtil.crafterCheck(this);
+        boolean hasBoss = false;
+
+        Iterator<FrostedBlock> it = s.iterator();
+        while (it.hasNext()) {
+            FrostedBlock next = it.next();
+            if (next.tick()) {
+                it.remove();
+            }
+        }
 
         for (World w : Bukkit.getWorlds()) {
-            for (LivingEntity e : w.getLivingEntities()) {
+            for (Entity entity : w.getEntities()) {
 
-                for (EntityTypeController c : controllers) {
-                    c.checkAndUpdate(e);
-                }
-                for (EntityTypeController c : nethercontrollers) {
-                    c.checkAndUpdate(e);
-                }
+                if ((entity instanceof LivingEntity)) {
+                    LivingEntity e = (LivingEntity) entity;
+                    for (EntityTypeController c : controllers) {
+                        c.checkAndUpdate(e);
+                    }
+                    for (EntityTypeController c : nethercontrollers) {
+                        c.checkAndUpdate(e);
+                    }
+                    if ("Hakai".equals(e.getCustomName())) {
+                        Skeleton hakai = (Skeleton) e;
 
-            }
-        }
+                        hasBoss = true;
+                        if (bb != null) {
+                            for (Player player : getServer().getOnlinePlayers()) {
+                                bb.addPlayer(player);
+                            }
+                            bb.setProgress(e.getHealth() / 1000.0D);
+                            if (e.getHealth() < 200.0D) {
+                                if (e.getHealth() < 100.0D) {
+                                    if (e.getHealth() < 50.0D) {
+                                        if (e.getTicksLived() % 2 == 0) {
+                                            bb.setColor(BarColor.WHITE);
+                                        } else {
+                                            bb.setColor(BarColor.RED);
+                                        }
 
-        for (Entry<Player, Integer> e : punchDelay.entrySet()) {
-            punchDelay.put(e.getKey(), e.getValue() - 1);
-        }
+                                    } else if (e.getTicksLived() / 5 % 2 == 0) {
+                                        bb.setColor(BarColor.WHITE);
+                                    } else {
+                                        bb.setColor(BarColor.RED);
+                                    }
 
-        for (Player p : getServer().getOnlinePlayers()) {
-            if (holdingblock.get(p) != null) {
-                holdingblock.get(p).teleport(p.getEyeLocation().add(p.getEyeLocation().getDirection().multiply(2)));
-            }
-            WaterUtils.constantPlayerChecks(p);
-            FireUtils.constantPlayerChecks(p);
-            AirUtils.constantPlayerChecks(p);
-            EarthUtils.constantPlayerChecks(p);
-            MetalUtils.constantPlayerChecks(p);
-            SkyUtils.constantPlayerChecks(p);
-            IceUtils.constantPlayerChecks(p);
-            LavaUtils.constantPlayerChecks(p);
-            PoisonUtils.constantPlayerChecks(p);
-            LightningUtils.constantPlayerChecks(p);
+                                } else if (e.getTicksLived() / 20 % 2 == 0) {
+                                    bb.setColor(BarColor.WHITE);
+                                } else {
+                                    bb.setColor(BarColor.RED);
+                                }
 
-
-            if (ArmourUtil.checkForBouncerBoots(p)) {
-                if (!p.isSneaking()) {
-                    if (p.isOnGround()) {
-                        if (p.isSprinting()) {
-                            p.setVelocity(p.getLocation().getDirection().multiply(2.5f).setY(1f));
-                        } else {
-                            p.setVelocity(p.getLocation().getDirection().setY(1f));
+                            } else {
+                                bb.setColor(BarColor.RED);
+                            }
                         }
-                        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_SLIME_ATTACK, 1, 1);
-                        for (Entity n : p.getNearbyEntities(5, 5, 5)) {
+
+                        hakai.playEffect(EntityEffect.SHEEP_EAT);
+                        hakai.setFallDistance(0.0F);
+                        hakai.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 100000, 255));
+                        hakai.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 100000, 2));
+                        hakai.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 100000, 0));
+                        hakai.setSilent(true);
+                        hakai.setCustomNameVisible(true);
+                        hakai.eject();
+
+                        hakai.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 100000, 1));
+
+                        if (e.getTicksLived() % 400 == 20) {
+                            Random r = new Random();
+                            int i = r.nextInt(4);
+                            if (i == 0) {
+                                hakaiOutToChat("Face my wrath!");
+                            } else if (i == 1) {
+                                hakaiOutToChat("You unleased this upon yourself!");
+                            } else if (i == 2) {
+                                hakaiOutToChat("Now die!");
+                            } else if (i == 3) {
+                                hakaiOutToChat("Muhahaha!");
+                            }
+                        }
+
+                        if (e.getTicksLived() % 60 == 0) {
+                            hakai.getWorld().playSound(hakai.getLocation(), Sound.ENTITY_PLAYER_BREATH, 1.0F, 1.0F);
+                        }
+                        if (e.getTicksLived() % 2 == 0) {
+                            hakai.getWorld().playSound(hakai.getLocation(), Sound.ENTITY_ZOMBIE_STEP, 0.4F, 1.0F);
+                        }
+                        if (((e.getTicksLived() % 100 == 0) || (e.getTicksLived() % 100 == 5) || (e.getTicksLived() % 100 == 15)) && (hakai.getTarget() != null)) {
+                            SmallFireball fireBall = (SmallFireball) hakai.getWorld().spawnEntity(hakai.getEyeLocation().add(hakai.getLocation().getDirection()),
+                                    EntityType.SMALL_FIREBALL);
+                            fireBall.setDirection(hakai.getTarget().getEyeLocation().subtract(hakai.getEyeLocation()).toVector());
+                            fireBall.setGlowing(true);
+                            fireBall.setShooter(hakai);
+                            fireBall.setFireTicks(40);
+                            fireBall.setVelocity(hakai.getTarget().getEyeLocation().subtract(hakai.getEyeLocation()).toVector());
+                            hakai.getWorld().playSound(hakai.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 0.4F, 1.0F);
+                        }
+
+                    }
+
+                } else if (entity.getType() == EntityType.DROPPED_ITEM) {
+                    Item i = (Item) entity;
+                    ItemStack is = i.getItemStack();
+
+                    if (i.getCustomName() != null && i.getCustomName().startsWith("Projectile-")) {
+                        i.getWorld().spawnParticle(Particle.CRIT, i.getLocation(), 0);
+
+                        boolean delete = false;
+                        List<Entity> nearbyEntities = i.getNearbyEntities(1, 1, 1);
+                        String name = i.getCustomName().split("-")[1];
+
+                        for (Entity en : nearbyEntities) {
+                            if (en instanceof LivingEntity) {
+                                if (!en.getName().equals(name)) {
+                                    ((LivingEntity) en).damage(4, Bukkit.getPlayer(name));
+                                    delete = true;
+                                }
+                            }
+                        }
+
+                        if (i.isOnGround()) {
+                            delete = true;
+                        }
+                        if (delete) {
+                            entity.remove();
+                        }
+                    }
+
+                    Dispenser dispenser2;
+                    if (is.getType() == Material.EMERALD) {
+                        if (i.getLocation().getBlock().getType() == Material.CAULDRON) {
+                            Block bl = i.getLocation().getBlock();
+                            List<Block> glowstone = new ArrayList<Block>();
+                            glowstone.add(bl.getLocation().add(1.0D, -1.0D, 0.0D).getBlock());
+                            glowstone.add(bl.getLocation().add(0.0D, -1.0D, 0.0D).getBlock());
+                            glowstone.add(bl.getLocation().add(-1.0D, -1.0D, 0.0D).getBlock());
+                            if (areAllOneType(Material.GLOWSTONE, glowstone)) {
+                                combinerLocations.add(LocationUtil.locationToStringRounded(bl.getLocation()));
+                                i.remove();
+
+                                bl.getLocation().add(-1.0D, 1.0D, 0.0D).getBlock().setType(Material.DISPENSER);
+                                bl.getLocation().add(-1.0D, 1.0D, 0.0D).getBlock().setData((byte) 6);
+                                Dispenser dispenser1 = (Dispenser) bl.getLocation().add(-1.0D, 1.0D, 0.0D).getBlock().getState();
+                                dispenser1.setCustomName("Elemental Combiner Slot 1");
+
+                                bl.getLocation().add(1.0D, 1.0D, 0.0D).getBlock().setType(Material.DISPENSER);
+                                bl.getLocation().add(1.0D, 1.0D, 0.0D).getBlock().setData((byte) 6);
+                                dispenser2 = (Dispenser) bl.getLocation().add(1.0D, 1.0D, 0.0D).getBlock().getState();
+                                dispenser2.setCustomName("Elemental Combiner Slot 2");
+
+                                bl.getLocation().add(1.0D, 0.0D, 0.0D).getBlock().setType(Material.NETHER_FENCE);
+                                bl.getLocation().add(-1.0D, 0.0D, 0.0D).getBlock().setType(Material.NETHER_FENCE);
+
+                                bl.getLocation().add(1.0D, -1.0D, 0.0D).getBlock().setType(Material.OBSIDIAN);
+                                bl.getLocation().add(-1.0D, -1.0D, 0.0D).getBlock().setType(Material.OBSIDIAN);
+                                bl.getLocation().add(0.0D, -1.0D, -1.0D).getBlock().setType(Material.OBSIDIAN);
+                                bl.getLocation().add(0.0D, -1.0D, 1.0D).getBlock().setType(Material.OBSIDIAN);
+
+                                bl.getLocation().add(0.0D, 0.0D, -1.0D).getBlock().setType(Material.STONE_BUTTON);
+                                bl.getLocation().add(0.0D, 0.0D, 1.0D).getBlock().setType(Material.STONE_BUTTON);
+                                bl.getLocation().add(0.0D, 0.0D, -1.0D).getBlock().setData((byte) 5);
+                                bl.getLocation().add(0.0D, 0.0D, 1.0D).getBlock().setType(Material.STONE_BUTTON);
+                                bl.getLocation().add(0.0D, 0.0D, 1.0D).getBlock().setData((byte) 5);
+
+                                bl.getLocation().getBlock().setData((byte) 3);
+
+                            }
+                        }
+                    } else if (is.getType() == Material.TOTEM) {
+                        Block bl = i.getLocation().getBlock();
+                        if ((i.getLocation().getBlock().getType() == Material.CAULDRON) && (is.hasItemMeta()) && ("Hakai".equals(is.getItemMeta().getDisplayName()))) {
+                            List<Block> stairs = new ArrayList<Block>();
+                            ((List) stairs).add(bl.getLocation().add(1.0D, -1.0D, 0.0D).getBlock());
+                            ((List) stairs).add(bl.getLocation().add(-1.0D, -1.0D, 0.0D).getBlock());
+                            ((List) stairs).add(bl.getLocation().add(0.0D, -1.0D, -1.0D).getBlock());
+                            ((List) stairs).add(bl.getLocation().add(0.0D, -1.0D, 1.0D).getBlock());
+                            if (areAllOneType(Material.NETHER_BRICK_STAIRS, stairs)) {
+                                i.remove();
+                                for (Block block : stairs) {
+                                    block.getWorld().createExplosion(block.getLocation(), 4.0F);
+                                }
+
+                                Skeleton skeleton = (Skeleton) i.getWorld().spawnEntity(i.getLocation(), EntityType.SKELETON);
+                                EntityEquipment eq = skeleton.getEquipment();
+                                int r = 50;
+
+                                ItemStack body = new ItemStack(Material.LEATHER_CHESTPLATE);
+                                LeatherArmorMeta bmeta = (LeatherArmorMeta) body.getItemMeta();
+                                bmeta.setColor(Color.fromRGB(r, 0, 0));
+                                body.setItemMeta(bmeta);
+
+                                ItemStack legs = new ItemStack(Material.LEATHER_LEGGINGS);
+                                LeatherArmorMeta lmeta = (LeatherArmorMeta) legs.getItemMeta();
+                                lmeta.setColor(Color.fromRGB(r, 0, 0));
+                                legs.setItemMeta(lmeta);
+
+                                ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
+                                LeatherArmorMeta bometa = (LeatherArmorMeta) boots.getItemMeta();
+                                bometa.setColor(Color.fromRGB(r, 0, 0));
+                                boots.setItemMeta(bometa);
+
+                                eq.setHelmet(new ItemStack(Material.NETHER_BRICK));
+                                eq.setChestplate(body);
+                                eq.setLeggings(legs);
+                                eq.setBoots(boots);
+
+                                skeleton.setCustomName("Hakai");
+
+                                eq.setItemInMainHand(new ItemStack(Material.STICK));
+                                eq.setItemInOffHand(new ItemStack(Material.STICK));
+
+                                MobUtils.setMaxHealth(skeleton, 1000.0D);
+                                skeleton.setHealth(1000.0D);
+                                skeleton.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(4.0D);
+
+                                skeleton.setRemoveWhenFarAway(false);
+                                bb = Bukkit.createBossBar("Hakai", BarColor.RED, BarStyle.SOLID, new BarFlag[] { BarFlag.CREATE_FOG });
+                                hakaiOutToChat("You have awoken me from my slumber!");
+                                for (Player player : getServer().getOnlinePlayers()) {
+                                    bb.addPlayer(player);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!hasBoss) {
+
+                if (bb != null) {
+                    bb.removeAll();
+                }
+            }
+
+            for (Map.Entry<Player, Integer> e : punchDelay.entrySet()) {
+                punchDelay.put(e.getKey(), Integer.valueOf(e.getValue().intValue() - 1));
+            }
+
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (holdingblock.get(p) != null) {
+                    Location targetLoc = p.getEyeLocation().add(p.getEyeLocation().getDirection().multiply(2));
+                    holdingblock.get(p).setVelocity(targetLoc.subtract(holdingblock.get(p).getLocation()).toVector());
+                }
+                ObsidianUtils.constantPlayerChecks(p);
+                SteamUtils.constantPlayerChecks(p);
+                WaterUtils.constantPlayerChecks(p);
+                FireUtils.constantPlayerChecks(p);
+                AirUtils.constantPlayerChecks(p);
+                EarthUtils.constantPlayerChecks(p);
+                MetalUtils.constantPlayerChecks(p);
+                SkyUtils.constantPlayerChecks(p);
+                IceUtils.constantPlayerChecks(p);
+                LavaUtils.constantPlayerChecks(p);
+                PoisonUtils.constantPlayerChecks(p);
+                LightningUtils.constantPlayerChecks(p);
+                FreezeUtils.constantPlayerChecks(p);
+                SandUtils.constantPlayerChecks(p);
+                if (ArmourUtil.checkForBouncerBoots(p)) {
+                    if ((!p.isSneaking()) && (p.isOnGround())) {
+                        if (p.isSprinting()) {
+                            p.setVelocity(p.getLocation().getDirection().multiply(2.5F).setY(1.0F));
+                        } else {
+                            p.setVelocity(p.getLocation().getDirection().setY(1.0F));
+                        }
+                        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_SLIME_ATTACK, 1.0F, 1.0F);
+                        for (Entity n : p.getNearbyEntities(5.0D, 5.0D, 5.0D)) {
                             if (!(n instanceof Player)) {
-                                n.setFallDistance(10f);
+                                n.setFallDistance(10.0F);
                                 if (n.getType() == EntityType.ARROW) {
                                     ((Arrow) n).setBounce(true);
                                 }
                             }
                         }
                     }
-                }
-                p.setFallDistance(0f);
-            }
 
-            if (ArmourUtil.checkForRiderLeggings(p)) {
-                p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 64, 10));
-                if (p.isOnGround() && p.isSprinting()) {
-                    p.setVelocity(p.getLocation().getDirection().setY(0).multiply(8f));
+                    p.setFallDistance(0.0F);
                 }
-            }
-            if (ArmourUtil.checkHoldingWarpBow(p)) {
-                p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 255));
-                p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40, 255));
 
-                for (Entity e : p.getNearbyEntities(2, 2, 2)) {
-                    if (e.getType() == EntityType.ARROW) {
-                        e.setVelocity(e.getVelocity().multiply(1.5f));
+                if (ArmourUtil.checkForRiderLeggings(p)) {
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 64, 10));
+                    if ((p.isOnGround()) && (p.isSprinting())) {
+                        p.setVelocity(p.getLocation().getDirection().setY(0).multiply(8.0F));
+                    }
+                }
+                if (ArmourUtil.checkHoldingWarpBow(p)) {
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 40, 255));
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40, 255));
+
+                    for (Entity e : p.getNearbyEntities(2.0D, 2.0D, 2.0D)) {
+                        if (e.getType() == EntityType.ARROW) {
+                            e.setVelocity(e.getVelocity().multiply(1.5F));
+                        }
                     }
                 }
             }
-
         }
-
     }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
-        event.getEntity().setMaxHealth(20D);
     }
-
-    // @EventHandler
-    // public void onDeath(EntityDeathEvent event) {
-    // getLogger().info("got death event!");
-    // LivingEntity e = event.getEntity();
-    //
-    // if (!(e instanceof Player)) {
-    // if (e.getCustomName() != null) {
-    // if (e.getLastDamageCause() != null) {
-    // EntityDamageEvent ede = e.getLastDamageCause();
-    //
-    // DamageCause dc = ede.getCause();
-    //
-    // String d = ede.getCause().toString().toLowerCase().replaceAll("_", " ");
-    // Bukkit.broadcastMessage("" + ChatColor.DARK_AQUA + e.getCustomName() + " died from " + d + " damage!!");
-    // } else {
-    // Bukkit.broadcastMessage("" + ChatColor.DARK_AQUA + e.getCustomName() + " was shot!");
-    // }
-    // }
-    // }
-    //
-    // }
 
     @EventHandler
     public void onHurt(EntityDamageEvent event) {
-        if (event.getEntity() instanceof Player) {
+        if ((event.getEntity() instanceof Player)) {
             Player p = (Player) event.getEntity();
-            if (LightningUtils.checkForHelmet(p)) {
-                if (event.getCause() == DamageCause.LIGHTNING) {
-                    event.setCancelled(true);
-                }
+            if ((LightningUtils.checkForHelmet(p)) && (event.getCause() == EntityDamageEvent.DamageCause.LIGHTNING)) {
+                event.setCancelled(true);
             }
         }
     }
 
     public static Entity[] getNearbyEntities(Location l, int radius) {
-        int chunkRadius = radius < 16 ? 1 : (radius - (radius % 16)) / 16;
-        HashSet<Entity> radiusEntities = new HashSet<Entity>();
+        int chunkRadius = radius < 16 ? 1 : (radius - radius % 16) / 16;
+        HashSet<Entity> radiusEntities = new HashSet();
         for (int chX = 0 - chunkRadius; chX <= chunkRadius; chX++) {
             for (int chZ = 0 - chunkRadius; chZ <= chunkRadius; chZ++) {
-                int x = (int) l.getX(), y = (int) l.getY(), z = (int) l.getZ();
-                for (Entity e : new Location(l.getWorld(), x + (chX * 16), y, z + (chZ * 16)).getChunk().getEntities()) {
-                    if (e.getLocation().distance(l) <= radius && e.getLocation().getBlock() != l.getBlock()) {
+                int x = (int) l.getX();
+                int y = (int) l.getY();
+                int z = (int) l.getZ();
+                for (Entity e : new Location(l.getWorld(), x + chX * 16, y, z + chZ * 16).getChunk().getEntities()) {
+                    if ((e.getLocation().distance(l) <= radius) && (e.getLocation().getBlock() != l.getBlock())) {
                         radiusEntities.add(e);
                     }
                 }
@@ -778,71 +998,61 @@ public final class Plugin extends JavaPlugin implements Listener {
         return radiusEntities.toArray(new Entity[radiusEntities.size()]);
     }
 
-    // @EventHandler
-    // public void onBlockPlaceEvent(BlockPlaceEvent event) {
-    // Block bl = event.getBlock();
-    // if (bl.getType() == )
-    // }
-
     @EventHandler
     public void onSpawnEvent(CreatureSpawnEvent event) {
-        if (event.getEntity() instanceof Monster && event.getEntity().getCustomName() == null && event.getSpawnReason() == SpawnReason.NATURAL) {
-
+        if (((event.getEntity() instanceof Monster)) && (event.getEntity().getCustomName() == null)
+                && (event.getSpawnReason() == org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL)) {
             Random random = new Random();
-            if (event.getLocation().getBlock().getBiome() == Biome.SKY) {
-
-            } else if (event.getLocation().getBlock().getBiome() == Biome.HELL) {
-                if (random.nextBoolean() && event.getEntityType() == EntityType.PIG_ZOMBIE) {
-                    int randomweight = random.nextInt(maxweight);
-                    for (WeightedEntityController c : nethercontrollers) {
-                        randomweight -= c.getWeight();
-                        if (randomweight < 0) {
-                            if (c.canSpawnThere(event.getLocation().getBlock())) {
+            if (event.getLocation().getBlock().getBiome() != Biome.SKY) {
+                if (event.getLocation().getBlock().getBiome() == Biome.HELL) {
+                    if ((random.nextBoolean()) && (event.getEntityType() == EntityType.PIG_ZOMBIE)) {
+                        int randomweight = random.nextInt(maxweight);
+                        for (WeightedEntityController c : nethercontrollers) {
+                            randomweight -= c.getWeight();
+                            if ((randomweight < 0) && (c.canSpawnThere(event.getLocation().getBlock()))) {
                                 c.spawn(event.getLocation());
                                 event.setCancelled(true);
                                 return;
                             }
                         }
-                    }
-                    if (randomweight > 0) {
-                        event.setCancelled(false);
-                    }
-                }
-            } else {
-                if (getMoonPhase(event.getLocation().getWorld()) == MoonPhases.NEW) {
 
-                    if (event.getEntity().getType() == EntityType.SQUID) {
-                        new RedGuardianController(0).spawn(event.getLocation());
-                        event.setCancelled(true);
-                        return;
-                    }
-                    EntityTypeController c = null;
-                    int entity = random.nextInt(10);
-                    if (entity == 0) {
-
-                        c = new ChaserController(0);
-                    } else if (entity == 1) {
-                        event.setCancelled(true);
-
-                        return;
-                    } else {
-                        if (random.nextBoolean()) {
-                            c = new BloodBatController(0);
-                        } else {
-                            c = new BloodRatController(0);
+                        if (randomweight > 0) {
+                            event.setCancelled(false);
                         }
                     }
+                } else {
+                    if (getMoonPhase(event.getLocation().getWorld()) == MoonPhases.NEW) {
+                        if (event.getEntity().getType() == EntityType.SQUID) {
+                            new RedGuardianController(0).spawn(event.getLocation());
+                            event.setCancelled(true);
+                            return;
+                        }
+                        EntityTypeController c = null;
+                        int entity = random.nextInt(10);
+                        if (entity == 0) {
+                            c = new ChaserController(0);
+                        } else {
+                            if (entity == 1) {
+                                event.setCancelled(true);
 
-                    c.spawn(event.getLocation());
-                    event.setCancelled(true);
-                    return;
-                }
+                                return;
+                            }
+                            if (random.nextBoolean()) {
+                                c = new BloodBatController(0);
+                            } else {
+                                c = new BloodRatController(0);
+                            }
+                        }
 
-                int randomweight = random.nextInt(maxweight);
-                for (WeightedEntityController c : controllers) {
-                    randomweight -= c.getWeight();
-                    if (randomweight < 0) {
-                        if (c.canSpawnThere(event.getLocation().getBlock())) {
+                        c.spawn(event.getLocation());
+                        event.setCancelled(true);
+                        return;
+                    }
+
+                    int randomweight = random.nextInt(maxweight);
+                    for (WeightedEntityController c : controllers) {
+                        randomweight -= c.getWeight();
+                        if ((randomweight < 0) && (c.canSpawnThere(event.getLocation().getBlock()))) {
                             c.spawn(event.getLocation());
                             event.setCancelled(true);
                             return;
@@ -851,7 +1061,6 @@ public final class Plugin extends JavaPlugin implements Listener {
                 }
             }
         }
-
     }
 
     public boolean areAllOneType(Material material, List<Block> list) {
@@ -863,7 +1072,7 @@ public final class Plugin extends JavaPlugin implements Listener {
         return true;
     }
 
-    public static void loadAll(JavaPlugin plugin) {
+    public void loadAll(JavaPlugin plugin) {
         ConfigurationSection configurationSection = plugin.getConfig().getConfigurationSection("crafters.locations");
         if (configurationSection == null) {
             configurationSection = plugin.getConfig().createSection("crafters.locations");
@@ -873,21 +1082,37 @@ public final class Plugin extends JavaPlugin implements Listener {
             crafterLocations.add(entry.getValue().toString());
         }
 
+        ConfigurationSection configurationSectiona = plugin.getConfig().getConfigurationSection("combiners.locations");
+        if (configurationSectiona == null) {
+            configurationSectiona = plugin.getConfig().createSection("combiners.locations");
+        }
+
+        for (Object entry : configurationSectiona.getValues(false).entrySet()) {
+            combinerLocations.add(((Map.Entry) entry).getValue().toString());
+        }
+
         ConfigurationSection configurationSection1 = plugin.getConfig().getConfigurationSection("skulls");
         if (configurationSection1 == null) {
             configurationSection1 = plugin.getConfig().createSection("skulls");
         }
         configurationSection1.getItemStack("MonkeySkull");
-
     }
 
-    public static void saveAll(JavaPlugin plugin) {
+    public void saveAll(JavaPlugin plugin) {
         ConfigurationSection configurationSection = plugin.getConfig().getConfigurationSection("crafters.locations");
         if (configurationSection == null) {
             configurationSection = plugin.getConfig().createSection("crafters.locations");
         }
         for (int i = 0; i < crafterLocations.size(); i++) {
             configurationSection.set(Integer.toString(i), crafterLocations.get(i));
+        }
+
+        ConfigurationSection configurationSectiocn = plugin.getConfig().getConfigurationSection("combiners.locations");
+        if (configurationSectiocn == null) {
+            configurationSectiocn = plugin.getConfig().createSection("combiners.locations");
+        }
+        for (int i = 0; i < combinerLocations.size(); i++) {
+            configurationSectiocn.set(Integer.toString(i), combinerLocations.get(i));
         }
 
         ConfigurationSection configurationSection1 = plugin.getConfig().getConfigurationSection("skulls");
@@ -917,79 +1142,155 @@ public final class Plugin extends JavaPlugin implements Listener {
                 }
             }
         }
+
+        if ("Hakai".equals(entity.getCustomName())) {
+            event.getDrops().clear();
+            event.getDrops().add(ArmourUtil.createDarkEssence());
+            event.getDrops().add(ArmourUtil.createDarkEssence());
+            event.getDrops().add(ArmourUtil.createDarkEssence());
+            event.getDrops().add(ArmourUtil.createDarkEssence());
+            event.getDrops().add(new ItemStack(Material.TOTEM));
+            event.getDrops().add(new ItemStack(Material.GOLDEN_APPLE, 2, (short) 1));
+            event.getDrops().add(new ItemStack(Material.BONE, 6));
+            hakaiOutToChat("This will not be the end!");
+            event.getEntity().remove();
+            entity.getWorld().playEffect(entity.getLocation(), org.bukkit.Effect.END_GATEWAY_SPAWN, 0);
+        }
     }
 
     public static MoonPhases getMoonPhase(World world) {
-        long days = world.getFullTime() / 24000;
-        long phase = days % 8;
+        long days = world.getFullTime() / 24000L;
+        long phase = days % 8L;
 
-        if (phase == 0) {
+        if (phase == 0L)
             return MoonPhases.FULL;
-        } else if (phase == 1) {
+        if (phase == 1L)
             return MoonPhases.WAINING_GIBBUS;
-        } else if (phase == 2) {
+        if (phase == 2L)
             return MoonPhases.WAINING_HALF;
-        } else if (phase == 3) {
+        if (phase == 3L)
             return MoonPhases.WAINING_CRESCENT;
-        } else if (phase == 4) {
+        if (phase == 4L)
             return MoonPhases.NEW;
-        } else if (phase == 5) {
+        if (phase == 5L)
             return MoonPhases.WAXING_CRESCENT;
-        } else if (phase == 6) {
+        if (phase == 6L)
             return MoonPhases.WAXING_HALF;
-        } else if (phase == 7) {
+        if (phase == 7L) {
             return MoonPhases.WAXING_GIBBUS;
         }
         return MoonPhases.UNKNOWN;
-
     }
 
     @EventHandler
     public void toggleGlideEvent(EntityToggleGlideEvent event) {
-
-        if (event.getEntity() instanceof Player) {
+        if ((event.getEntity() instanceof Player)) {
             Player p = (Player) event.getEntity();
-            if (SkyUtils.checkForBoots(p)) {
-                if (p.isGliding()) {
-                    // toggle off
-                    if (!p.isOnGround()) {
-                        event.setCancelled(true);
-                        p.setGliding(true);
-                    }
-                } else {
-                    // toggle on
+            if ((SkyUtils.checkForBoots(p)) && (p.isGliding())) {
+                if (!p.isOnGround()) {
+                    event.setCancelled(true);
+                    p.setGliding(true);
                 }
             }
         }
     }
 
     public static boolean day(World w) {
-
         long time = w.getTime();
 
-        return time < 12300 || time > 23850;
+        return (time < 12300L) || (time > 23850L);
     }
 
-    // @EventHandler
+    @EventHandler
     public void onChunkPopulate(ChunkPopulateEvent event) {
         Chunk chunk = event.getChunk();
-        if (chunk.getBlock(0, 64, 0).getBiome() == Biome.DEEP_OCEAN || chunk.getBlock(0, 64, 0).getBiome() == Biome.OCEAN) {
-            if (Math.random() > 0.95) {
-                for (int x = 0; x < 16; x++) {
-                    for (int z = 0; z < 16; z++) {
-                        for (int y = 32; y < 128; y++) {
-                            Block current = chunk.getBlock(x, y, z);
-                            if (current.getBiome() == Biome.DEEP_OCEAN || current.getBiome() == Biome.OCEAN) {
-                                if (current.getType() == Material.GRAVEL) {
-                                    createSeaHouse(current);
-                                    return;
-                                }
-                            }
-                        }
-                    }
+
+        if ((Math.random() < 0.01D) && (chunk.getBlock(0, 0, 0).getBiome() == Biome.SWAMPLAND)) {
+            Block centre = chunk.getBlock(2, 0, 2);
+
+            for (int i = 100; i > 40; i--) {
+                if ((chunk.getBlock(2, i, 2).getType() == Material.DIRT) || (chunk.getBlock(2, i, 2).getType() == Material.GRASS)) {
+                    centre = chunk.getBlock(2, i, 2);
+                    System.out.println("break");
+
+                    break;
                 }
             }
+            if (centre.equals(chunk.getBlock(2, 0, 2))) {
+                System.out.println("none");
+                return;
+            }
+            System.out.println(centre.getX() + " " + centre.getY() + " " + centre.getZ());
+
+            centre.getLocation().add(-1.0D, 0.0D, 0.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+            centre.getLocation().add(-1.0D, 0.0D, 0.0D).getBlock().setData((byte) 0);
+
+            centre.getLocation().add(1.0D, 0.0D, 0.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+            centre.getLocation().add(1.0D, 0.0D, 0.0D).getBlock().setData((byte) 1);
+
+            centre.getLocation().add(0.0D, 0.0D, -1.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+            centre.getLocation().add(0.0D, 0.0D, -1.0D).getBlock().setData((byte) 2);
+
+            centre.getLocation().add(0.0D, 0.0D, 1.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+            centre.getLocation().add(0.0D, 0.0D, 1.0D).getBlock().setData((byte) 3);
+
+            centre.getLocation().add(-1.0D, 1.0D, 0.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+            centre.getLocation().add(-1.0D, 1.0D, 0.0D).getBlock().setData((byte) 4);
+
+            centre.getLocation().add(1.0D, 1.0D, 0.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+            centre.getLocation().add(1.0D, 1.0D, 0.0D).getBlock().setData((byte) 5);
+
+            centre.getLocation().add(0.0D, 1.0D, -1.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+            centre.getLocation().add(0.0D, 1.0D, -1.0D).getBlock().setData((byte) 6);
+
+            centre.getLocation().add(0.0D, 1.0D, 1.0D).getBlock().setType(Material.NETHER_BRICK_STAIRS);
+            centre.getLocation().add(0.0D, 1.0D, 1.0D).getBlock().setData((byte) 7);
+
+            centre.getLocation().add(0.0D, 1.0D, 0.0D).getBlock().setType(Material.CAULDRON);
+            centre.getLocation().add(0.0D, 1.0D, 0.0D).getBlock().setData((byte) 3);
+
+            Block chest1 = centre.getLocation().add(2.0D, 0.0D, 0.0D).getBlock();
+            Chest fillChest = fillChest(chest1);
+            ItemStack item = fillChest.getInventory().getItem(13);
+            item = new ItemStack(Material.TOTEM);
+            ItemMeta itemMeta = item.getItemMeta();
+            itemMeta.setDisplayName("Hakai");
+            List<String> lores = new ArrayList();
+            lores.add(ChatColor.WHITE + "I wonder what will happen if i place it in the cauldron...");
+            itemMeta.setLore(lores);
+            item.setItemMeta(itemMeta);
+            fillChest.getInventory().setItem(13, item);
+            Block chest2 = centre.getLocation().add(-2.0D, 0.0D, 0.0D).getBlock();
+            fillChest(chest2);
+            Block chest3 = centre.getLocation().add(0.0D, 0.0D, 2.0D).getBlock();
+            fillChest(chest3);
+            Block chest4 = centre.getLocation().add(0.0D, 0.0D, -2.0D).getBlock();
+            fillChest(chest4);
         }
+    }
+
+    public Chest fillChest(Block chest1) {
+        chest1.setType(Material.CHEST);
+        Chest state = (Chest) chest1.getState();
+        Inventory inv1 = state.getInventory();
+        for (int i = 0; i < inv1.getSize(); i++) {
+            Random random = new Random();
+            int n = random.nextInt(200);
+            if (n < 1) {
+                inv1.setItem(i, new ItemStack(Material.DIAMOND_BLOCK));
+            } else if (n < 5) {
+                inv1.setItem(i, new ItemStack(Material.DIAMOND));
+            } else if (n < 20) {
+                inv1.setItem(i, new ItemStack(Material.GOLD_INGOT));
+            } else if (n < 50) {
+                inv1.setItem(i, new ItemStack(Material.GOLD_NUGGET));
+            } else if (n < 60) {
+                inv1.setItem(i, new ItemStack(Material.IRON_INGOT));
+            } else if (n < 100) {
+                inv1.setItem(i, new ItemStack(Material.APPLE));
+            }
+        }
+        return state;
     }
 
     public void fill(Block[] blocks, Material type) {
@@ -1005,35 +1306,34 @@ public final class Plugin extends JavaPlugin implements Listener {
         }
     }
 
-    public void setSquidSpawner(Block block) {
+    public void setSpawner(Block block, EntityType type) {
         BlockState blockState = block.getState();
-        CreatureSpawner spawner = ((CreatureSpawner) blockState);
-        spawner.setSpawnedType(EntityType.SQUID);
+        CreatureSpawner spawner = (CreatureSpawner) blockState;
+        spawner.setSpawnedType(type);
         blockState.update();
     }
 
     public void createSeaHouse(Block current) {
         current.setType(Material.PRISMARINE);
-        fill(current.getLocation().add(3, 0, 3), current.getLocation().add(-3, 0, -3), Material.STONE);
-        fill(current.getLocation().add(3, 1, 3), current.getLocation().add(-3, 5, -3), Material.PRISMARINE);
-        fill(current.getLocation().add(2, 1, 2), current.getLocation().add(-2, 4, -2), Material.WATER);
-        fill(current.getLocation().add(3, 1, 0), current.getLocation().add(3, 2, 0), Material.WATER);
-        fill(current.getLocation().add(0, 5, 0), current.getLocation().add(0, 8, 0), Material.SEA_LANTERN);
+        fill(current.getLocation().add(3.0D, 0.0D, 3.0D), current.getLocation().add(-3.0D, 0.0D, -3.0D), Material.STONE);
+        fill(current.getLocation().add(3.0D, 1.0D, 3.0D), current.getLocation().add(-3.0D, 5.0D, -3.0D), Material.PRISMARINE);
+        fill(current.getLocation().add(2.0D, 1.0D, 2.0D), current.getLocation().add(-2.0D, 4.0D, -2.0D), Material.WATER);
+        fill(current.getLocation().add(3.0D, 1.0D, 0.0D), current.getLocation().add(3.0D, 2.0D, 0.0D), Material.WATER);
+        fill(current.getLocation().add(0.0D, 5.0D, 0.0D), current.getLocation().add(0.0D, 8.0D, 0.0D), Material.SEA_LANTERN);
 
-        fill(current.getLocation().add(3, 0, 3), current.getLocation().add(3, 6, 3), Material.GOLD_BLOCK);
-        fill(current.getLocation().add(-3, 0, 3), current.getLocation().add(-3, 6, 3), Material.GOLD_BLOCK);
-        fill(current.getLocation().add(3, 0, -3), current.getLocation().add(3, 6, -3), Material.GOLD_BLOCK);
-        fill(current.getLocation().add(-3, 0, -3), current.getLocation().add(-3, 6, -3), Material.GOLD_BLOCK);
+        fill(current.getLocation().add(3.0D, 0.0D, 3.0D), current.getLocation().add(3.0D, 6.0D, 3.0D), Material.GOLD_BLOCK);
+        fill(current.getLocation().add(-3.0D, 0.0D, 3.0D), current.getLocation().add(-3.0D, 6.0D, 3.0D), Material.GOLD_BLOCK);
+        fill(current.getLocation().add(3.0D, 0.0D, -3.0D), current.getLocation().add(3.0D, 6.0D, -3.0D), Material.GOLD_BLOCK);
+        fill(current.getLocation().add(-3.0D, 0.0D, -3.0D), current.getLocation().add(-3.0D, 6.0D, -3.0D), Material.GOLD_BLOCK);
 
         current.setType(Material.MOB_SPAWNER);
-        setSquidSpawner(current);
+        setSpawner(current, EntityType.SQUID);
 
-        Block b = current.getLocation().add(0, 1, 0).getBlock();
+        Block b = current.getLocation().add(0.0D, 1.0D, 0.0D).getBlock();
         b.setType(Material.CHEST);
 
         Chest chest = (Chest) b.getState();
 
-        // get the inventory to edit it
         Inventory inv = chest.getInventory();
 
         ItemStack fish = new ItemStack(Material.RAW_FISH);
@@ -1056,45 +1356,41 @@ public final class Plugin extends JavaPlugin implements Listener {
             }
         }
 
-        // From here do as you need. This is all pseudo code
-
         for (int i = 0; i < 4; i++) {
-
             Zombie zombie = (Zombie) current.getWorld().spawnEntity(current.getLocation(), EntityType.ZOMBIE);
 
             EntityEquipment zomb = zombie.getEquipment();
-            zombie.setMaxHealth(60D);
-            zombie.setHealth(60D);
+            zombie.setMaxHealth(60.0D);
+            zombie.setHealth(60.0D);
 
             zombie.setVillager(false);
             zombie.setBaby(false);
 
             zomb.setBoots(ArmourUtil.createAquaBoots());
-            zomb.setBootsDropChance(1f);
+            zomb.setBootsDropChance(1.0F);
             zomb.setLeggings(ArmourUtil.createAquaPants());
             zomb.setChestplate(ArmourUtil.createAquaShirt());
             zomb.setHelmet(new ItemStack(Material.SEA_LANTERN));
-            // zomb.setItemInHand(new ItemStack(Material.STONE_HOE));
+
             zombie.setCustomName("Sea Monster");
             zombie.teleport(current.getLocation());
         }
         for (int i = 0; i < 5; i++) {
-
-            Zombie zombie = (Zombie) current.getWorld().spawnEntity(current.getLocation().add(0, 1, 0), EntityType.ZOMBIE);
+            Zombie zombie = (Zombie) current.getWorld().spawnEntity(current.getLocation().add(0.0D, 1.0D, 0.0D), EntityType.ZOMBIE);
 
             EntityEquipment zomb = zombie.getEquipment();
-            zombie.setMaxHealth(60D);
-            zombie.setHealth(60D);
+            zombie.setMaxHealth(60.0D);
+            zombie.setHealth(60.0D);
 
             zombie.setVillager(false);
             zombie.setBaby(true);
 
             zomb.setBoots(ArmourUtil.createAquaBoots());
-            zomb.setBootsDropChance(1f);
+            zomb.setBootsDropChance(1.0F);
             zomb.setLeggings(ArmourUtil.createAquaPants());
             zomb.setChestplate(ArmourUtil.createAquaShirt());
             zomb.setHelmet(new ItemStack(Material.SEA_LANTERN));
-            // zomb.setItemInHand(new ItemStack(Material.STONE_HOE));
+
             zombie.setCustomName("Sea Monster");
             zombie.teleport(current.getLocation());
         }
@@ -1102,58 +1398,57 @@ public final class Plugin extends JavaPlugin implements Listener {
 
     public void createTower(Block current) {
         current.setType(Material.STONE);
-        fill(current.getLocation().add(3, 0, 3), current.getLocation().add(-3, -20, -3), Material.COBBLESTONE);
-        fill(current.getLocation().add(3, 10, 3), current.getLocation().add(-3, 0, -3), Material.STONE);
-        fill(current.getLocation().add(2, 10, 2), current.getLocation().add(-2, 1, -2), Material.AIR);
+        fill(current.getLocation().add(3.0D, 0.0D, 3.0D), current.getLocation().add(-3.0D, -20.0D, -3.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(3.0D, 10.0D, 3.0D), current.getLocation().add(-3.0D, 0.0D, -3.0D), Material.STONE);
+        fill(current.getLocation().add(2.0D, 10.0D, 2.0D), current.getLocation().add(-2.0D, 1.0D, -2.0D), Material.AIR);
 
-        fill(current.getLocation().add(0, 1, 3), current.getLocation().add(0, 11, 3), Material.COBBLESTONE);
-        fill(current.getLocation().add(0, 1, -3), current.getLocation().add(0, 11, -3), Material.COBBLESTONE);
-        fill(current.getLocation().add(3, 1, 0), current.getLocation().add(3, 11, 0), Material.COBBLESTONE);
-        fill(current.getLocation().add(-3, 1, 0), current.getLocation().add(-3, 11, 0), Material.COBBLESTONE);
+        fill(current.getLocation().add(0.0D, 1.0D, 3.0D), current.getLocation().add(0.0D, 11.0D, 3.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(0.0D, 1.0D, -3.0D), current.getLocation().add(0.0D, 11.0D, -3.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(3.0D, 1.0D, 0.0D), current.getLocation().add(3.0D, 11.0D, 0.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(-3.0D, 1.0D, 0.0D), current.getLocation().add(-3.0D, 11.0D, 0.0D), Material.COBBLESTONE);
 
-        fill(current.getLocation().add(3, 10, 3), current.getLocation().add(3, 0, 3), Material.AIR);
-        fill(current.getLocation().add(-3, 10, -3), current.getLocation().add(-3, 0, -3), Material.AIR);
-        fill(current.getLocation().add(3, 10, -3), current.getLocation().add(3, 0, -3), Material.AIR);
-        fill(current.getLocation().add(-3, 10, 3), current.getLocation().add(-3, 0, 3), Material.AIR);
+        fill(current.getLocation().add(3.0D, 10.0D, 3.0D), current.getLocation().add(3.0D, 0.0D, 3.0D), Material.AIR);
+        fill(current.getLocation().add(-3.0D, 10.0D, -3.0D), current.getLocation().add(-3.0D, 0.0D, -3.0D), Material.AIR);
+        fill(current.getLocation().add(3.0D, 10.0D, -3.0D), current.getLocation().add(3.0D, 0.0D, -3.0D), Material.AIR);
+        fill(current.getLocation().add(-3.0D, 10.0D, 3.0D), current.getLocation().add(-3.0D, 0.0D, 3.0D), Material.AIR);
 
-        fill(current.getLocation().add(0, 1, 3), current.getLocation().add(0, 2, 3), Material.AIR);
-        fill(current.getLocation().add(0, 1, -3), current.getLocation().add(0, 2, -3), Material.AIR);
-        fill(current.getLocation().add(3, 1, 0), current.getLocation().add(3, 2, 0), Material.AIR);
-        fill(current.getLocation().add(-3, 1, 0), current.getLocation().add(-3, 2, 0), Material.AIR);
+        fill(current.getLocation().add(0.0D, 1.0D, 3.0D), current.getLocation().add(0.0D, 2.0D, 3.0D), Material.AIR);
+        fill(current.getLocation().add(0.0D, 1.0D, -3.0D), current.getLocation().add(0.0D, 2.0D, -3.0D), Material.AIR);
+        fill(current.getLocation().add(3.0D, 1.0D, 0.0D), current.getLocation().add(3.0D, 2.0D, 0.0D), Material.AIR);
+        fill(current.getLocation().add(-3.0D, 1.0D, 0.0D), current.getLocation().add(-3.0D, 2.0D, 0.0D), Material.AIR);
 
-        fill(current.getLocation().add(3, 1, -1), current.getLocation().add(3, 3, 1), Material.AIR);
+        fill(current.getLocation().add(3.0D, 1.0D, -1.0D), current.getLocation().add(3.0D, 3.0D, 1.0D), Material.AIR);
 
-        fill(current.getLocation().add(0, 5, 3), current.getLocation().add(0, 6, 3), Material.AIR);
-        fill(current.getLocation().add(0, 5, -3), current.getLocation().add(0, 6, -3), Material.AIR);
-        fill(current.getLocation().add(3, 5, 0), current.getLocation().add(3, 6, 0), Material.AIR);
-        fill(current.getLocation().add(-3, 5, 0), current.getLocation().add(-3, 6, 0), Material.AIR);
+        fill(current.getLocation().add(0.0D, 5.0D, 3.0D), current.getLocation().add(0.0D, 6.0D, 3.0D), Material.AIR);
+        fill(current.getLocation().add(0.0D, 5.0D, -3.0D), current.getLocation().add(0.0D, 6.0D, -3.0D), Material.AIR);
+        fill(current.getLocation().add(3.0D, 5.0D, 0.0D), current.getLocation().add(3.0D, 6.0D, 0.0D), Material.AIR);
+        fill(current.getLocation().add(-3.0D, 5.0D, 0.0D), current.getLocation().add(-3.0D, 6.0D, 0.0D), Material.AIR);
 
-        fill(current.getLocation().add(2, 4, 2), current.getLocation().add(-2, 4, -2), Material.COBBLESTONE);
-        fill(current.getLocation().add(1, 4, 1), current.getLocation().add(-1, 4, -1), Material.AIR);
+        fill(current.getLocation().add(2.0D, 4.0D, 2.0D), current.getLocation().add(-2.0D, 4.0D, -2.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(1.0D, 4.0D, 1.0D), current.getLocation().add(-1.0D, 4.0D, -1.0D), Material.AIR);
 
-        fill(current.getLocation().add(2, 9, 2), current.getLocation().add(-2, 9, -2), Material.COBBLESTONE);
-        fill(current.getLocation().add(1, 9, 1), current.getLocation().add(-1, 9, -1), Material.AIR);
+        fill(current.getLocation().add(2.0D, 9.0D, 2.0D), current.getLocation().add(-2.0D, 9.0D, -2.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(1.0D, 9.0D, 1.0D), current.getLocation().add(-1.0D, 9.0D, -1.0D), Material.AIR);
 
-        fill(current.getLocation().add(2, 11, 3), current.getLocation().add(2, 0, 3), Material.COBBLESTONE);
+        fill(current.getLocation().add(2.0D, 11.0D, 3.0D), current.getLocation().add(2.0D, 0.0D, 3.0D), Material.COBBLESTONE);
 
-        fill(current.getLocation().add(-2, 11, -3), current.getLocation().add(-2, 0, -3), Material.COBBLESTONE);
-        fill(current.getLocation().add(2, 11, -3), current.getLocation().add(2, 0, -3), Material.COBBLESTONE);
-        fill(current.getLocation().add(-2, 11, 3), current.getLocation().add(-2, 0, 3), Material.COBBLESTONE);
-        fill(current.getLocation().add(3, 11, 2), current.getLocation().add(3, 0, 2), Material.COBBLESTONE);
-        fill(current.getLocation().add(-3, 11, -2), current.getLocation().add(-3, 0, -2), Material.COBBLESTONE);
-        fill(current.getLocation().add(3, 11, -2), current.getLocation().add(3, 0, -2), Material.COBBLESTONE);
-        fill(current.getLocation().add(-3, 11, 2), current.getLocation().add(-3, 0, 2), Material.COBBLESTONE);
+        fill(current.getLocation().add(-2.0D, 11.0D, -3.0D), current.getLocation().add(-2.0D, 0.0D, -3.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(2.0D, 11.0D, -3.0D), current.getLocation().add(2.0D, 0.0D, -3.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(-2.0D, 11.0D, 3.0D), current.getLocation().add(-2.0D, 0.0D, 3.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(3.0D, 11.0D, 2.0D), current.getLocation().add(3.0D, 0.0D, 2.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(-3.0D, 11.0D, -2.0D), current.getLocation().add(-3.0D, 0.0D, -2.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(3.0D, 11.0D, -2.0D), current.getLocation().add(3.0D, 0.0D, -2.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(-3.0D, 11.0D, 2.0D), current.getLocation().add(-3.0D, 0.0D, 2.0D), Material.COBBLESTONE);
 
-        fill(current.getLocation().add(0, 11, 0), current.getLocation().add(0, 0, 0), Material.COBBLESTONE);
-        fill(current.getLocation().add(0, 11, 0), current.getLocation().add(0, 11, 0), Material.GLOWSTONE);
-        fill(current.getLocation().add(0, 1, 0), current.getLocation().add(0, 1, 0), Material.GLOWSTONE);
+        fill(current.getLocation().add(0.0D, 11.0D, 0.0D), current.getLocation().add(0.0D, 0.0D, 0.0D), Material.COBBLESTONE);
+        fill(current.getLocation().add(0.0D, 11.0D, 0.0D), current.getLocation().add(0.0D, 11.0D, 0.0D), Material.GLOWSTONE);
+        fill(current.getLocation().add(0.0D, 1.0D, 0.0D), current.getLocation().add(0.0D, 1.0D, 0.0D), Material.GLOWSTONE);
 
-        Block b = current.getLocation().add(0, 12, 0).getBlock();
+        Block b = current.getLocation().add(0.0D, 12.0D, 0.0D).getBlock();
         b.setType(Material.CHEST);
 
         Chest chest = (Chest) b.getState();
 
-        // get the inventory to edit it
         Inventory inv = chest.getInventory();
 
         for (int i = 0; i < 27; i++) {
@@ -1167,34 +1462,89 @@ public final class Plugin extends JavaPlugin implements Listener {
                 inv.setItem(i, EarthUtils.createEarthHelmet());
             }
         }
-
     }
 
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
-        if ("Eyeball".equals(event.getEntity().getCustomName())) {
-            if (event.getDamage() < 7) {
-                EyeController c = new EyeController(0);
-                c.spawn(event.getEntity().getLocation());
+        if (("Eyeball".equals(event.getEntity().getCustomName())) && (event.getDamage() <= 4.0D)) {
+            EyeController c = new EyeController(0);
+            c.spawn(event.getEntity().getLocation());
+        }
+
+        if ("Hakai".equals(event.getEntity().getCustomName())) {
+            event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
+        }
+        if ("Hakai".equals(event.getDamager().getCustomName())) {
+            if (event.getDamager().getTicksLived() % 5 != 0) {
+                event.getEntity()
+                        .setVelocity(event.getEntity().getLocation().add(0.0D, 1.0D, 0.0D).subtract(event.getDamager().getLocation()).toVector().multiply(2.0F).setY(2.0D));
+                event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 1.0F, 1.0F);
+            } else {
+                Entity e = event.getEntity();
+                e.setVelocity(new Vector(0, 0, 0));
+                e.getLocation().getBlock().setType(Material.WATER);
+                e.getLocation().getBlock().setData((byte) 15);
             }
         }
-        if ("Bandit".equals(event.getDamager().getCustomName()) && event.getDamager() instanceof Zombie) {
+
+        if (("Bandit".equals(event.getDamager().getCustomName())) && ((event.getDamager() instanceof Zombie))) {
             Zombie z = (Zombie) event.getDamager();
-            if (event.getEntity() instanceof Player) {
+            if ((event.getEntity() instanceof Player)) {
                 Player p = (Player) event.getEntity();
-                if (z.getEquipment().getItemInMainHand().getType() == Material.WOOD_SWORD && p.getEquipment().getItemInMainHand().getType() != Material.WOOD_SWORD
-                        && p.getEquipment().getItemInMainHand().getType().toString().contains("SWORD")) {
+                if ((z.getEquipment().getItemInMainHand().getType() == Material.WOOD_SWORD) && (p.getEquipment().getItemInMainHand().getType() != Material.WOOD_SWORD)
+                        && (p.getEquipment().getItemInMainHand().getType().toString().contains("SWORD"))) {
                     z.getEquipment().setItemInMainHand(p.getItemInHand());
-                    z.getEquipment().setItemInMainHandDropChance(1f);
+                    z.getEquipment().setItemInMainHandDropChance(1.0F);
                     p.getItemInHand().setType(Material.AIR);
                     p.getItemInHand().setType(Material.WOOD_SWORD);
                     p.getItemInHand().setDurability((short) 0);
-                    ;
-
                 }
-
             }
         }
     }
 
+    @EventHandler
+    public void onbreak(BlockBreakEvent event) {
+        Block b = event.getBlock();
+        if (b.getType() == Material.LONG_GRASS) {
+            Random random = new Random();
+            if (random.nextInt(20) == 0) {
+                ArmorStand a = (ArmorStand) b.getWorld().spawnEntity(b.getLocation().add(0.0D, -0.5D, 0.0D), EntityType.ARMOR_STAND);
+                a.setCustomName(ChatColor.RED + "♥");
+                a.setCustomNameVisible(true);
+                a.setGravity(false);
+                a.setVisible(false);
+                a.setSmall(true);
+                a.setAI(false);
+                a.setVelocity(new Vector(0, 0, 0));
+                a.setInvulnerable(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        ObsidianUtils.onMove(e);
+        LavaUtils.onMove(e);
+        IceUtils.onMove(e);
+
+        Player p = e.getPlayer();
+        for (Entity entity : p.getNearbyEntities(1.0D, 1.0D, 1.0D)) {
+            if ((ChatColor.RED + "♥").equals(entity.getCustomName())) {
+                entity.remove();
+                p.getWorld().playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F, 1.0F);
+                if (p.getHealth() + 2.0D <= p.getMaxHealth()) {
+                    p.setHealth(p.getHealth() + 2.0D);
+                } else {
+                    p.setHealth(p.getMaxHealth());
+                }
+            }
+            if ((ChatColor.BOLD + "" + ChatColor.RED + "[♥]").equals(entity.getCustomName())) {
+                entity.remove();
+                p.getWorld().playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
+
+                p.setMaxHealth(p.getMaxHealth() + 2.0D);
+            }
+        }
+    }
 }

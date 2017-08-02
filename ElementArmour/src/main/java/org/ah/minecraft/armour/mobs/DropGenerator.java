@@ -1,16 +1,20 @@
 package org.ah.minecraft.armour.mobs;
 
-import java.util.Random;
-
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.md_5.bungee.api.ChatColor;
-
 public class DropGenerator {
+    public DropGenerator() {
+    }
+
     public static ItemStack i(Material m, int max) {
-        return new ItemStack(m, new Random().nextInt(max));
+        return new ItemStack(m, new java.util.Random().nextInt(max));
+    }
+
+    public static ItemStack i(ItemStack m, int max) {
+        m.setAmount(new java.util.Random().nextInt(max));
+        return m;
     }
 
     public static ItemStack i(Material m) {
@@ -26,9 +30,9 @@ public class DropGenerator {
     }
 
     public static ItemStack i(Material m, int max, String name) {
-        ItemStack i = new ItemStack(m, new Random().nextInt(max));
+        ItemStack i = new ItemStack(m, new java.util.Random().nextInt(max));
         ItemMeta im = i.getItemMeta();
-        im.setDisplayName(ChatColor.RESET + name);
+        im.setDisplayName(net.md_5.bungee.api.ChatColor.RESET + name);
         i.setItemMeta(im);
         return i;
     }
