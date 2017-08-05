@@ -15,7 +15,7 @@ import org.ah.minecraft.armour.utils.ObsidianUtils;
 import org.ah.minecraft.armour.utils.PoisonUtils;
 import org.ah.minecraft.armour.utils.SandUtils;
 import org.ah.minecraft.armour.utils.SkyUtils;
-import org.ah.minecraft.armour.utils.SteamUtils;
+import org.ah.minecraft.armour.utils.RainUtils;
 import org.ah.minecraft.armour.utils.WaterUtils;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -97,7 +97,7 @@ public class CombiningUtil {
                                     result = FreezeUtils.createBoots();
                                 }
                                 if (item2.equals(SkyUtils.createSkyBoots())) {
-                                    result = SteamUtils.createBoots();
+                                    result = RainUtils.createBoots();
                                 }
                             } else if (item1.equals(LavaUtils.createLavaBoots())) {
                                 if (item2.equals(IceUtils.createIceBoots())) {
@@ -111,7 +111,7 @@ public class CombiningUtil {
                                 }
                             } else if (item1.equals(SkyUtils.createSkyBoots())) {
                                 if (item2.equals(IceUtils.createIceBoots())) {
-                                    result = SteamUtils.createBoots();
+                                    result = RainUtils.createBoots();
                                 }
                                 if (item2.equals(MetalUtils.createMetalBoots())) {
                                     result = SandUtils.createBoots();
@@ -138,7 +138,7 @@ public class CombiningUtil {
                                     result = FreezeUtils.createLeggings();
                                 }
                                 if (item2.equals(SkyUtils.createSkyLeggings())) {
-                                    result = SteamUtils.createLeggings();
+                                    result = RainUtils.createLeggings();
                                 }
                             } else if (item1.equals(LavaUtils.createLavaLeggings())) {
                                 if (item2.equals(IceUtils.createIceLeggings())) {
@@ -152,7 +152,7 @@ public class CombiningUtil {
                                 }
                             } else if (item1.equals(SkyUtils.createSkyLeggings())) {
                                 if (item2.equals(IceUtils.createIceLeggings())) {
-                                    result = SteamUtils.createLeggings();
+                                    result = RainUtils.createLeggings();
                                 }
                                 if (item2.equals(MetalUtils.createMetalLeggings())) {
                                     result = SandUtils.createLeggings();
@@ -179,7 +179,7 @@ public class CombiningUtil {
                                     result = FreezeUtils.createChestplate();
                                 }
                                 if (item2.equals(SkyUtils.createSkyChestplate())) {
-                                    result = SteamUtils.createChestplate();
+                                    result = RainUtils.createChestplate();
                                 }
                             } else if (item1.equals(LavaUtils.createLavaChestplate())) {
                                 if (item2.equals(IceUtils.createIceChestplate())) {
@@ -193,7 +193,7 @@ public class CombiningUtil {
                                 }
                             } else if (item1.equals(SkyUtils.createSkyChestplate())) {
                                 if (item2.equals(IceUtils.createIceChestplate())) {
-                                    result = SteamUtils.createChestplate();
+                                    result = RainUtils.createChestplate();
                                 }
                                 if (item2.equals(MetalUtils.createMetalChestplate())) {
                                     result = SandUtils.createChestplate();
@@ -220,7 +220,7 @@ public class CombiningUtil {
                                     result = FreezeUtils.createHelmet();
                                 }
                                 if (item2.equals(SkyUtils.createSkyHelmet())) {
-                                    result = SteamUtils.createHelmet();
+                                    result = RainUtils.createHelmet();
                                 }
                             } else if (item1.equals(LavaUtils.createLavaHelmet())) {
                                 if (item2.equals(IceUtils.createIceHelmet())) {
@@ -234,7 +234,7 @@ public class CombiningUtil {
                                 }
                             } else if (item1.equals(SkyUtils.createSkyHelmet())) {
                                 if (item2.equals(IceUtils.createIceHelmet())) {
-                                    result = SteamUtils.createHelmet();
+                                    result = RainUtils.createHelmet();
                                 }
                                 if (item2.equals(MetalUtils.createMetalHelmet())) {
                                     result = SandUtils.createHelmet();

@@ -14,7 +14,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,7 +23,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public class WaterUtils {
-    private static final Color BLUE = Color.fromRGB(60, 60, 255);
+    private static final Color BLUE =Color.fromRGB(70, 100, 255);
 
     private WaterUtils() {
     }
@@ -44,11 +43,11 @@ public class WaterUtils {
                 bl2.setType(Material.WATER);
                 bl2.setData((byte) 15);
 
-                for (Entity e : org.ah.minecraft.armour.Plugin.getNearbyEntities(loc, 5)) {
+                for (Entity e : org.ah.minecraft.armour.Plugin.getNearbyEntities(loc, 2)) {
                     if ((!e.equals(p)) && ((e instanceof LivingEntity))) {
-                        ((LivingEntity) e).damage(13.0D);
+                        ((LivingEntity) e).damage(4.0D, p);
 
-                        ((LivingEntity) e).setLastDamageCause(new EntityDamageEvent(e, EntityDamageEvent.DamageCause.DROWNING, 10.0D));
+
                     }
                 }
             }

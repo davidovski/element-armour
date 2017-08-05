@@ -28,6 +28,7 @@ import org.ah.minecraft.armour.mobs.WeightedEntityController;
 import org.ah.minecraft.armour.mobs.WispController;
 import org.ah.minecraft.armour.utils.AirUtils;
 import org.ah.minecraft.armour.utils.ArmourUtil;
+import org.ah.minecraft.armour.utils.DarkUtils;
 import org.ah.minecraft.armour.utils.EarthUtils;
 import org.ah.minecraft.armour.utils.FireUtils;
 import org.ah.minecraft.armour.utils.FreezeUtils;
@@ -38,9 +39,9 @@ import org.ah.minecraft.armour.utils.LightningUtils;
 import org.ah.minecraft.armour.utils.MetalUtils;
 import org.ah.minecraft.armour.utils.ObsidianUtils;
 import org.ah.minecraft.armour.utils.PoisonUtils;
+import org.ah.minecraft.armour.utils.RainUtils;
 import org.ah.minecraft.armour.utils.SandUtils;
 import org.ah.minecraft.armour.utils.SkyUtils;
-import org.ah.minecraft.armour.utils.SteamUtils;
 import org.ah.minecraft.armour.utils.WaterUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -294,6 +295,20 @@ public final class Plugin extends JavaPlugin implements Listener {
                 p.getInventory().addItem(new ItemStack[] { ObsidianUtils.createLeggings() });
                 return true;
             }
+            if (cmd.getName().equalsIgnoreCase("Dark")) {
+                p.getInventory().addItem(new ItemStack[] { DarkUtils.createBoots() });
+                p.getInventory().addItem(new ItemStack[] { DarkUtils.createChestplate() });
+                p.getInventory().addItem(new ItemStack[] { DarkUtils.createHelmet() });
+                p.getInventory().addItem(new ItemStack[] { DarkUtils.createLeggings() });
+                return true;
+            }
+            if (cmd.getName().equalsIgnoreCase("Rain")) {
+                p.getInventory().addItem(new ItemStack[] { RainUtils.createBoots() });
+                p.getInventory().addItem(new ItemStack[] { RainUtils.createChestplate() });
+                p.getInventory().addItem(new ItemStack[] { RainUtils.createHelmet() });
+                p.getInventory().addItem(new ItemStack[] { RainUtils.createLeggings() });
+                return true;
+            }
             if (cmd.getName().equalsIgnoreCase("Lava")) {
                 p.getInventory().addItem(new ItemStack[] { LavaUtils.createLavaBoots() });
                 p.getInventory().addItem(new ItemStack[] { LavaUtils.createLavaChestplate() });
@@ -345,13 +360,10 @@ public final class Plugin extends JavaPlugin implements Listener {
                 im.setLore(Arrays.asList(ChatColor.GOLD + "Magic paper! WOOSH!"));
                 out.setItemMeta(im);
 
-
                 Villager vil = (Villager) p.getLocation().getWorld().spawnEntity(p.getLocation(), EntityType.VILLAGER);
                 VillagerTradeApi.clearTrades(vil);
                 VillagerTrade trade = new VillagerTrade(i, null, out);
                 VillagerTradeApi.addTrade(vil, trade);
-
-
 
             } else if (!cmd.getName().equalsIgnoreCase("sea")) {
                 if (cmd.getName().equalsIgnoreCase("spawnTower")) {
@@ -620,6 +632,8 @@ public final class Plugin extends JavaPlugin implements Listener {
                     LavaUtils.checkPunch(p);
                     PoisonUtils.checkPunch(p);
                     ObsidianUtils.checkPunch(p);
+                    RainUtils.checkPunch(p);
+                    DarkUtils.checkPunch(p);
                     punchDelay.put(p, Integer.valueOf(5));
                 }
 
@@ -912,7 +926,8 @@ public final class Plugin extends JavaPlugin implements Listener {
                     holdingblock.get(p).setVelocity(targetLoc.subtract(holdingblock.get(p).getLocation()).toVector());
                 }
                 ObsidianUtils.constantPlayerChecks(p);
-                SteamUtils.constantPlayerChecks(p);
+                DarkUtils.constantPlayerChecks(p);
+                RainUtils.constantPlayerChecks(p);
                 WaterUtils.constantPlayerChecks(p);
                 FireUtils.constantPlayerChecks(p);
                 AirUtils.constantPlayerChecks(p);
@@ -925,6 +940,7 @@ public final class Plugin extends JavaPlugin implements Listener {
                 LightningUtils.constantPlayerChecks(p);
                 FreezeUtils.constantPlayerChecks(p);
                 SandUtils.constantPlayerChecks(p);
+                RainUtils.constantPlayerChecks(p);
                 if (ArmourUtil.checkForBouncerBoots(p)) {
                     if ((!p.isSneaking()) && (p.isOnGround())) {
                         if (p.isSprinting()) {
@@ -1186,7 +1202,7 @@ public final class Plugin extends JavaPlugin implements Listener {
     public void toggleGlideEvent(EntityToggleGlideEvent event) {
         if ((event.getEntity() instanceof Player)) {
             Player p = (Player) event.getEntity();
-            if ((SkyUtils.checkForBoots(p)) && (p.isGliding())) {
+            if (((SkyUtils.checkForBoots(p)) || DarkUtils.checkForBoots(p)) && (p.isGliding())) {
                 if (!p.isOnGround()) {
                     event.setCancelled(true);
                     p.setGliding(true);
@@ -1527,6 +1543,7 @@ public final class Plugin extends JavaPlugin implements Listener {
         ObsidianUtils.onMove(e);
         LavaUtils.onMove(e);
         IceUtils.onMove(e);
+        DarkUtils.onMove(e);
 
         Player p = e.getPlayer();
         for (Entity entity : p.getNearbyEntities(1.0D, 1.0D, 1.0D)) {

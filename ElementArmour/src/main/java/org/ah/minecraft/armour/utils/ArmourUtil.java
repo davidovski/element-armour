@@ -26,6 +26,24 @@ public class ArmourUtil {
     private ArmourUtil() {
     }
 
+    public static void removeXP(Player p, int ammount) {
+        float a = ammount / 100;
+        if (p.getExp() - a > 0) {
+            p.setExp(p.getExp() - a);
+        } else {
+            if (p.getExp() > 0) {
+                a = a - p.getExp();
+
+                p.setLevel(p.getLevel() - 1);
+                p.setExp(1.0f - a);
+
+            } else {
+                p.setExp(0.99f);
+                p.setLevel(p.getLevel() - 1);
+            }
+        }
+    }
+
     public static org.bukkit.inventory.ItemStack addArmourAttributes(org.bukkit.inventory.ItemStack i) {
         net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(i);
         NBTTagCompound compound = nmsStack.getTag();
