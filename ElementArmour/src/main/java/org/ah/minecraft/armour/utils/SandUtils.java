@@ -124,6 +124,8 @@ public class SandUtils
     meta.setDisplayName("Sand Boots");
 
     List<String> lores = new ArrayList();
+    lores.add(ChatColor.WHITE + "Jump and sneak at the same time to create a huge sandy groundpound");
+    lores.add(ChatColor.WHITE + "Only works on sand.");
     lores.add(ChatColor.WHITE + "   ");
     lores.add(ChatColor.GRAY + "Set: " + ChatColor.YELLOW + "AIR" + ChatColor.GREEN + "EARTH");
     lores.add(ChatColor.GRAY + "Tier III");
@@ -157,7 +159,7 @@ public class SandUtils
     meta.setDisplayName("Sand Helmet");
 
     List<String> lores = new ArrayList();
-    lores.add(ChatColor.BLUE + "Right-click your enemies to Sand / unSand them");
+    lores.add(ChatColor.BLUE + "Pick sand up by right clicking it!");
     lores.add(ChatColor.WHITE + "   ");
     lores.add(ChatColor.GRAY + "Set: " + ChatColor.YELLOW + "AIR" + ChatColor.GREEN + "EARTH");
     lores.add(ChatColor.GRAY + "Tier III");

@@ -1,0 +1,3 @@
+name: SlightlyDifferentWorldGeneration
+main: org.ah.minecraft.generator.SDWG
+version: 1.0

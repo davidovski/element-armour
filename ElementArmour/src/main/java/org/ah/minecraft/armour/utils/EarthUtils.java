@@ -97,7 +97,7 @@ public class EarthUtils {
         meta.setDisplayName("Earth Helmet");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.DARK_GREEN + "Punch rocks to pick them up, then punch again to throw them!");
+        lores.add(ChatColor.DARK_GREEN + "right-click on rocks to pick them up, and punch them towards your enemies");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.GREEN + "EARTH");
         lores.add(ChatColor.GRAY + "Tier I");

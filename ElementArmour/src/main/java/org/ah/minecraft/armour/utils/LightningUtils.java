@@ -75,7 +75,7 @@ public class LightningUtils {
         meta.setDisplayName("Storm Boots");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.RED + "Create a electric forcefield");
+        lores.add(ChatColor.WHITE + "Create a electric forcefield by sneaking and jumping");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.RED + "FIRE" + ChatColor.YELLOW + "AIR");
         lores.add(ChatColor.GRAY + "Tier III");
@@ -108,7 +108,7 @@ public class LightningUtils {
         meta.setDisplayName("Storm Helmet");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.RED + "Lightning");
+        lores.add(ChatColor.WHITE + "Strike lightining at your will with a single punch!");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.RED + "FIRE" + ChatColor.YELLOW + "AIR");
         lores.add(ChatColor.GRAY + "Tier III");

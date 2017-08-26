@@ -104,7 +104,7 @@ public class FreezeUtils {
         meta.setDisplayName("Freeze Helmet");
 
         List<String> lores = new ArrayList<String>();
-        lores.add(ChatColor.BLUE + "Right-click your enemies to freeze / unfreeze them");
+        lores.add(ChatColor.BLUE + "Right-click your enemies to freeze them solid");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.BLUE + "WATER" + ChatColor.GREEN + "EARTH");
         lores.add(ChatColor.GRAY + "Tier III");

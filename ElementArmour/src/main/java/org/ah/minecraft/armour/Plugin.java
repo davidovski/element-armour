@@ -91,6 +91,7 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -162,7 +163,7 @@ public final class Plugin extends JavaPlugin implements Listener {
         controllers.add(new ChaserController(0));
 
         controllers.add(new SkeletonFarmerController(90));
-        controllers.add(new org.ah.minecraft.armour.mobs.SkeletonWariorController(120));
+        controllers.add(new org.ah.minecraft.armour.mobs.SkeletonWariorController(140));
 
         controllers.add(new VampireController(60));
         controllers.add(new EyeController(40));
@@ -452,6 +453,7 @@ public final class Plugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player p = event.getPlayer();
+        p.setMaxHealth(20);
         if ((!p.hasPlayedBefore()) && (getServer().getOperators().isEmpty())) {
             p.setOp(true);
         }
@@ -990,6 +992,9 @@ public final class Plugin extends JavaPlugin implements Listener {
     public void onHurt(EntityDamageEvent event) {
         if ((event.getEntity() instanceof Player)) {
             Player p = (Player) event.getEntity();
+            if (SkyUtils.checkForBoots(p) && (event.getCause() == DamageCause.FLY_INTO_WALL || event.getCause() == DamageCause.FALL)) {
+                event.setCancelled(true);
+            }
             if ((LightningUtils.checkForHelmet(p)) && (event.getCause() == EntityDamageEvent.DamageCause.LIGHTNING)) {
                 event.setCancelled(true);
             }
@@ -1016,6 +1021,10 @@ public final class Plugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onSpawnEvent(CreatureSpawnEvent event) {
+
+        if (event.getEntity() instanceof Skeleton) {
+            event.getEntity().getEquipment().setHelmet(ArmourUtil.createWariorHelmet());
+        }
         if (((event.getEntity() instanceof Monster)) && (event.getEntity().getCustomName() == null)
                 && (event.getSpawnReason() == org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.NATURAL)) {
             Random random = new Random();

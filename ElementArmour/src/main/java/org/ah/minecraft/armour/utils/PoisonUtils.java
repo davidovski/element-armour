@@ -67,7 +67,7 @@ public class PoisonUtils {
         meta.setDisplayName("Poison Boots");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.RED + "Be immune to poison!");
+        lores.add(ChatColor.GREEN + "Be immune to poison!");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.RED + "FIRE" + ChatColor.BLUE + "WATER");
         lores.add(ChatColor.GRAY + "Tier III");
@@ -100,7 +100,7 @@ public class PoisonUtils {
         meta.setDisplayName("Poison Helmet");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.RED + "Punch to splash some Poison");
+        lores.add(ChatColor.GREEN + "Punch to splash some Poison");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.RED + "FIRE" + ChatColor.BLUE + "WATER");
         lores.add(ChatColor.GRAY + "Tier III");

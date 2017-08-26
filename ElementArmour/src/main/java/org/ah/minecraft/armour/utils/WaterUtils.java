@@ -94,7 +94,7 @@ public class WaterUtils {
         meta.setDisplayName("Water Boots");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.DARK_BLUE + "Walk ON water by sneaking!");
+        lores.add(ChatColor.DARK_BLUE + "Swim faster by sneaking");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.BLUE + "WATER");
         lores.add(ChatColor.GRAY + "Teir I");

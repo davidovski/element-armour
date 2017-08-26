@@ -197,6 +197,8 @@ public class DarkUtils {
         meta.setDisplayName("Dark Boots");
 
         List<String> lores = new ArrayList();
+        lores.add(ChatColor.WHITE + "Look up and sneak to fly");
+        lores.add(ChatColor.WHITE + "look down and sneak to drill to the centre of the earth");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.DARK_PURPLE + "CRYSTAL");
         lores.add(ChatColor.GRAY + "Tier IV");
@@ -229,7 +231,7 @@ public class DarkUtils {
         meta.setDisplayName("Dark Helmet");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.BLUE + "Right-click lava to turn it solid, and break Dark with your bare hands!");
+        lores.add(ChatColor.BLUE + "See in the dark, and break blocks with your bare hands.");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.DARK_PURPLE + "CRYSTAL");
         lores.add(ChatColor.GRAY + "Tier IV");

@@ -112,7 +112,7 @@ public class RainUtils {
         meta.setDisplayName("Rain Boots");
 
         List<String> lores = new ArrayList<String>();
-        lores.add(ChatColor.DARK_BLUE + "Walk ON water by sneaking!");
+        lores.add(ChatColor.DARK_BLUE + "Sneak in midair when it is raining to not fall down...");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.BLUE + "WATER" + ChatColor.YELLOW + "AIR");
         lores.add(ChatColor.GRAY + "Teir III");
@@ -146,7 +146,7 @@ public class RainUtils {
         meta.setDisplayName("Rain Helmet");
 
         List<String> lores = new ArrayList<String>();
-        lores.add(ChatColor.DARK_BLUE + "Punch to splash some water");
+        lores.add(ChatColor.DARK_BLUE + "Throw Hail at your enemies by punching.");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.BLUE + "WATER" + ChatColor.YELLOW + "AIR");
         lores.add(ChatColor.GRAY + "Teir III");

@@ -127,7 +127,7 @@ public class LavaUtils {
         meta.setDisplayName("Lava Boots");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.RED + "Walk ON Lava by sneaking!");
+        lores.add(ChatColor.RED + "Walk ON Lava!");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.RED + "FIRE");
         lores.add(ChatColor.GRAY + "Tier II");
@@ -160,7 +160,7 @@ public class LavaUtils {
         meta.setDisplayName("Lava Helmet");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.RED + "Punch to splash some lava");
+        lores.add(ChatColor.RED + "Throw huge ghast fireballs by punching");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.RED + "FIRE");
         lores.add(ChatColor.GRAY + "Tier II");

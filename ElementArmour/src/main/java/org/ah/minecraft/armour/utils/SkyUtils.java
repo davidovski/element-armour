@@ -89,7 +89,7 @@ public class SkyUtils
     meta.setDisplayName("Sky Boots");
 
     List<String> lores = new ArrayList();
-    lores.add(ChatColor.DARK_GRAY + "Press LSHIFT to fly!!!");
+    lores.add(ChatColor.DARK_GRAY + "Sneak to fly!!!");
     lores.add(ChatColor.WHITE + "   ");
     lores.add(ChatColor.GRAY + "Set: " + ChatColor.YELLOW + "AIR");
     lores.add(ChatColor.GRAY + "Tier II");
@@ -124,7 +124,7 @@ public class SkyUtils
     meta.setDisplayName("Sky Helmet");
 
     List<String> lores = new ArrayList();
-    lores.add(ChatColor.WHITE + "Launch your enimies by blowing them away!");
+    lores.add(ChatColor.DARK_GRAY + "Launch your enimies by blowing them away!");
     lores.add(ChatColor.WHITE + "   ");
     lores.add(ChatColor.GRAY + "Set: " + ChatColor.YELLOW + "AIR");
     lores.add(ChatColor.GRAY + "Tier II");

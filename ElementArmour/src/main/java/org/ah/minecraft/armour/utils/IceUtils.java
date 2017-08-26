@@ -179,7 +179,7 @@ public class IceUtils {
         meta.setDisplayName("Ice Boots");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.DARK_GREEN + "Unleash their mighty power by sneaking in mid jump!");
+        lores.add(ChatColor.WHITE + "jump and sneak to create a icey protection around you.");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.BLUE + "WATER");
         lores.add(ChatColor.GRAY + "Tier II");
@@ -216,7 +216,7 @@ public class IceUtils {
         meta.setDisplayName("Ice Helmet");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.DARK_GREEN + "Create spikes by punching!");
+        lores.add(ChatColor.WHITE + "Create spikes by punching!");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.BLUE + "WATER");
         lores.add(ChatColor.GRAY + "Tier II");

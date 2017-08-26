@@ -175,7 +175,7 @@ public class MetalUtils {
         meta.setDisplayName("Metal Boots");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.DARK_GREEN + "Unleash their mighty power by sneaking in mid jump!");
+        lores.add(ChatColor.GRAY + "Jump then sneak to kick out some fangs");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.GREEN + "EARTH");
         lores.add(ChatColor.GRAY + "Tier II");
@@ -208,7 +208,7 @@ public class MetalUtils {
         meta.setDisplayName("Metal Helmet");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.DARK_GREEN + "Create spikes by punching!");
+        lores.add(ChatColor.GRAY + "Create metalic fangs by punching!");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.GREEN + "EARTH");
         lores.add(ChatColor.GRAY + "Tier II");

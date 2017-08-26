@@ -1,0 +1,22 @@
+name: CoreMachines
+main: org.ah.minecraft.machines.CorePlugin
+version: 1.1
+
+
+commands:
+   CoreMachines:
+      description: All you need to know about the plugin
+      usage: /CoreMachines
+      permission: 
+      permission-message: You don't have <permission>
+   machine:
+      description: makes a machine
+      usage: /machine
+      permission: 
+      permission-message: You don't have <permission>
+   commandblock:
+      description: makes a commandblock
+      usage: /commandblock
+      permission: 
+      permission-message: You don't have <permission>
+   

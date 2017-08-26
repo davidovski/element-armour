@@ -123,6 +123,7 @@ public class ObsidianUtils {
         meta.setDisplayName("Obsidian Boots");
 
         List<String> lores = new ArrayList();
+        lores.add(ChatColor.WHITE + "turn lava that you walk on into obsidian!");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.RED + "FIRE" + ChatColor.GREEN + "EARTH");
         lores.add(ChatColor.GRAY + "Tier III");

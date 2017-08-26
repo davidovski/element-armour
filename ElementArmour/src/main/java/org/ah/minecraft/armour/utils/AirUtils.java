@@ -117,7 +117,7 @@ public class AirUtils {
         meta.setDisplayName("Air Helmet");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.WHITE + "Creates a gust of wind to attack your enemies");
+        lores.add(ChatColor.WHITE + "Creates a gust of wind to blow away your enemies");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.YELLOW + "AIR");
         lores.add(ChatColor.GRAY + "Tier I");
