@@ -55,10 +55,12 @@ public class UndeathController extends CustomEntityController {
 
         for (Player p : e.getWorld().getPlayers()) {
             double distanceSquared = p.getLocation().distanceSquared(e.getLocation());
-            if ((distanceSquared < 25.0D) && (p.equals(((Zombie) e).getTarget()))) {
+            if (((distanceSquared < 25.0D) && (p.equals(((Zombie) e).getTarget()))) || (distanceSquared < 9.0D)) {
                 p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 30, 180, true, false), true);
-                p.getWorld().playEffect(p.getLocation(), Effect.STEP_SOUND, Material.OBSIDIAN, 10);
-                p.getWorld().playEffect(p.getEyeLocation(), Effect.STEP_SOUND, Material.OBSIDIAN, 10);
+                if (p.getTicksLived() % 5 == 0) {
+                    p.getWorld().playEffect(p.getLocation(), Effect.STEP_SOUND, Material.OBSIDIAN, 10);
+                    p.getWorld().playEffect(p.getEyeLocation(), Effect.STEP_SOUND, Material.OBSIDIAN, 10);
+                }
                 p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 30, 1, true, false), true);
                 e.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 30, 1, true, false), true);
             }
@@ -108,7 +110,7 @@ public class UndeathController extends CustomEntityController {
     public List<ItemStack> getDrops() {
         List<ItemStack> drops = new ArrayList();
         drops.add(DropGenerator.i(Material.INK_SACK, 4));
-        if (Math.random() > 0.8) {
+        if (Math.random() < 0.01) {
             drops.add(DropGenerator.i(ArmourUtil.createDarkEssence(), 2));
         }
         return drops;

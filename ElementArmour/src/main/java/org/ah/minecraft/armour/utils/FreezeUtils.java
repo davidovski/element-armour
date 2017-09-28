@@ -28,15 +28,17 @@ public class FreezeUtils {
     }
 
     public static void onPlayerInteractEntity(PlayerInteractAtEntityEvent event, Plugin plugin) {
-        if ((event.getRightClicked() instanceof LivingEntity)) {
-            LivingEntity e = (LivingEntity) event.getRightClicked();
-            Player p = event.getPlayer();
-            if ((checkForHelmet(p)) && (e.hasAI())) {
-                e.setAI(false);
-                e.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20, 0), true);
+        if (checkForHelmet(event.getPlayer())) {
+            if ((event.getRightClicked() instanceof LivingEntity)) {
+                LivingEntity e = (LivingEntity) event.getRightClicked();
+                Player p = event.getPlayer();
+                if ((checkForHelmet(p)) && (e.hasAI())) {
+                    e.setAI(false);
+                    e.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20, 0), true);
 
-                e.setGravity(false);
-                org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, new Unfreezemob(e), 20L);
+                    e.setGravity(false);
+                    org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, new Unfreezemob(e), 20L);
+                }
             }
         }
     }

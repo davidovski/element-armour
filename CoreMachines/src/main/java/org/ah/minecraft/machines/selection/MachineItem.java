@@ -26,6 +26,23 @@ public class MachineItem extends ItemStack {
             meta.setDisplayName(ChatColor.WHITE + "Block Breaker");
             setItemMeta(meta);
         }
+        if (type == MachineType.PLACE) {
+            ingredients.add(new ItemStack(Material.REDSTONE));
+            ingredients.add(new ItemStack(Material.STONE, 8));
+            setType(Material.COBBLESTONE);
+            ItemMeta meta = getItemMeta();
+            meta.setDisplayName(ChatColor.WHITE + "Block Placer");
+            setItemMeta(meta);
+        }
+        if (type == MachineType.FARM) {
+            ingredients.add(new ItemStack(Material.IRON_HOE));
+            ingredients.add(new ItemStack(Material.COBBLESTONE, 8));
+            ingredients.add(new ItemStack(Material.WATER_BUCKET));
+            setType(Material.WOOD_HOE);
+            ItemMeta meta = getItemMeta();
+            meta.setDisplayName(ChatColor.WHITE + "Mini Farmer");
+            setItemMeta(meta);
+        }
         listIngredients();
     }
 

@@ -10,6 +10,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
@@ -21,6 +22,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
 public class RainUtils {
 
@@ -41,13 +43,13 @@ public class RainUtils {
             Block b6 = new Location(tb.getWorld(), tb.getX() + 1, tb.getY() + 2, tb.getZ()).getBlock();
             Block b7 = new Location(tb.getWorld(), tb.getX() - 1, tb.getY() + 2, tb.getZ()).getBlock();
 
-            FrostedBlock.setBlock(b1, Material.WATER, 3);
+            FrostedBlock.setBlock(b1, Material.ICE, 3);
             FrostedBlock.setBlock(b2, Material.PACKED_ICE, 3);
-            FrostedBlock.setBlock(b3, Material.WATER, 3);
-            FrostedBlock.setBlock(b4, Material.WATER, 3);
-            FrostedBlock.setBlock(b5, Material.WATER, 3);
-            FrostedBlock.setBlock(b6, Material.WATER, 3);
-            FrostedBlock.setBlock(b7, Material.WATER, 3);
+            FrostedBlock.setBlock(b3, Material.ICE, 3);
+            FrostedBlock.setBlock(b4, Material.ICE, 3);
+            FrostedBlock.setBlock(b5, Material.ICE, 3);
+            FrostedBlock.setBlock(b6, Material.ICE, 3);
+            FrostedBlock.setBlock(b7, Material.ICE, 3);
 
             for (Entity e : Plugin.getNearbyEntities(b2.getLocation(), 3)) {
                 if (!e.equals(p)) {
@@ -65,19 +67,18 @@ public class RainUtils {
     public static void constantPlayerChecks(Player p) {
 
         if (checkForBoots(p)) {
-            p.setFallDistance(p.getFallDistance() / 2);
-            Location loc = p.getLocation();
+            p.setFallDistance(0.0F);
 
             if (p.isSneaking()) {
-                if (p.getWorld().hasStorm()) {
-                    p.setGravity(false);
-                } else {
-                    p.setGravity(true);
-                }
-            } else {
-                p.setGravity(true);
+              p.setGliding(true);
+              p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, SoundCategory.PLAYERS, 1.0F, 1.0F);
+              Vector vec = p.getVelocity().add(p.getLocation().getDirection().multiply(0.01));
+              if (vec.length() > 4) {
+                  vec.multiply(0.9);
+              }
+              p.setVelocity(vec);
             }
-        }
+          }
 
         if (checkForChestplate(p)) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40, 4));

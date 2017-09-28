@@ -1,5 +1,6 @@
-package org.ah.minecraft.items;
+package org.ah.minecraft.armour;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -42,10 +43,6 @@ public class ItemUtils {
                  }
              }
          }
-
-	 public static void removeItem(ItemStack i) {
-             removeItems(i, 1);
-	 }
 
     public static ItemStack getSkull(String skullOwner) {
         String display = ChatColor.GREEN + skullOwner;
@@ -123,6 +120,15 @@ public class ItemUtils {
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
+    }
+    public static ItemStack getCustomItem(Material watch, String name, String string) {
+        ArrayList<String> arrayList = new ArrayList<String>();
+        String[] split = string.split("\n");
+        for (String s : split) {
+            arrayList.add(s);
+        }
+        return getCustomItem(watch, name, arrayList);
+
     }
 }
 

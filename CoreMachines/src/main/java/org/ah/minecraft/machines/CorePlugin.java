@@ -97,6 +97,18 @@ public class CorePlugin extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(e.getControlPanel(), this);
             machines.add(e);
             return e;
+        } else if (type == MachineType.PLACE) {
+            PlaceMachine e = new PlaceMachine(b);
+            getServer().getPluginManager().registerEvents(e, this);
+            getServer().getPluginManager().registerEvents(e.getControlPanel(), this);
+            machines.add(e);
+            return e;
+        } else if (type == MachineType.FARM) {
+            FarmMachine e = new FarmMachine(b);
+            getServer().getPluginManager().registerEvents(e, this);
+            getServer().getPluginManager().registerEvents(e.getControlPanel(), this);
+            machines.add(e);
+            return e;
         }
         return null;
     }

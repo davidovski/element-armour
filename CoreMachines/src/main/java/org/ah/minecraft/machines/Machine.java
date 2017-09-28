@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
@@ -212,6 +213,25 @@ public abstract class Machine implements MachineInterface, Listener {
         } else {
             block.getWorld().dropItem(block.getRelative(getDirection().getOppositeFace()).getLocation(), i);
         }
+    }
+
+    public Inventory getBackInv() {
+        if (block.getRelative(getDirection().getOppositeFace()).getType() != Material.AIR) {
+            try {
+                Block relative = block.getRelative(getDirection().getOppositeFace());
+                if (relative.getState() instanceof InventoryHolder) {
+                    InventoryHolder ih = (InventoryHolder) relative.getState();
+                    return ih.getInventory();
+                } else {
+                    return null;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+        }
+
+        return null;
     }
     public String save() {
         String json = "{\"type\":" + getType().getId() + ",\"coal\":" + coal + ",\"running\":" + running + ",\"coalSpeed\":" + coalSpeed + ",\"speed\":" + menu.getPercentSpeed()

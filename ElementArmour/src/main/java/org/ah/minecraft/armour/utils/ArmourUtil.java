@@ -44,6 +44,19 @@ public class ArmourUtil {
         }
     }
 
+
+    public static boolean compare(org.bukkit.inventory.ItemStack one,   org.bukkit.inventory.ItemStack two) {
+        if (one.getType() == two.getType()) {
+            if (one.hasItemMeta() && two.hasItemMeta()) {
+                if (one.getItemMeta().equals(two.getItemMeta())) {
+                    return true;
+                }
+                return false;
+            } else {return true;}
+        }
+        return false;
+    }
+
     public static org.bukkit.inventory.ItemStack addArmourAttributes(org.bukkit.inventory.ItemStack i) {
         net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(i);
         NBTTagCompound compound = nmsStack.getTag();

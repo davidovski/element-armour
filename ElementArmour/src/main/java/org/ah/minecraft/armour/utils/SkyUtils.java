@@ -8,6 +8,7 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -55,9 +56,11 @@ public class SkyUtils
 
       if (p.isSneaking()) {
         p.setGliding(true);
-        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 1.0F, 1.0F);
-        Vector vec = p.getLocation().getDirection();
-        vec.multiply(1.3f);
+        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, SoundCategory.PLAYERS, 1.0F, 1.0F);
+        Vector vec = p.getVelocity().add(p.getLocation().getDirection().multiply(0.05));
+        if (vec.length() > 2) {
+            vec.multiply(0.9);
+        }
         p.setVelocity(vec);
       }
     }

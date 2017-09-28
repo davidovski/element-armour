@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.ah.minecraft.armour.utils.AirUtils;
+import org.ah.minecraft.armour.utils.ArmourUtil;
 import org.ah.minecraft.armour.utils.EarthUtils;
 import org.ah.minecraft.armour.utils.FireUtils;
 import org.ah.minecraft.armour.utils.FreezeUtils;
@@ -13,9 +14,9 @@ import org.ah.minecraft.armour.utils.LightningUtils;
 import org.ah.minecraft.armour.utils.MetalUtils;
 import org.ah.minecraft.armour.utils.ObsidianUtils;
 import org.ah.minecraft.armour.utils.PoisonUtils;
+import org.ah.minecraft.armour.utils.RainUtils;
 import org.ah.minecraft.armour.utils.SandUtils;
 import org.ah.minecraft.armour.utils.SkyUtils;
-import org.ah.minecraft.armour.utils.RainUtils;
 import org.ah.minecraft.armour.utils.WaterUtils;
 import org.bukkit.Effect;
 import org.bukkit.Location;
@@ -89,167 +90,167 @@ public class CombiningUtil {
                         Block b2 = LocationUtil.stringToLocation(plugin.getServer(), locationString).add(0.0D, -1.0D, 1.0D).getBlock();
 
                         if ((b.isBlockPowered()) || (b2.isBlockPowered())) {
-                            if (item1.equals(IceUtils.createIceBoots())) {
-                                if (item2.equals(LavaUtils.createLavaBoots())) {
+                            if (ArmourUtil.compare(item1, IceUtils.createIceBoots())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaBoots())) {
                                     result = PoisonUtils.createBoots();
                                 }
-                                if (item2.equals(MetalUtils.createMetalBoots())) {
+                                if (ArmourUtil.compare(item2,MetalUtils.createMetalBoots())) {
                                     result = FreezeUtils.createBoots();
                                 }
-                                if (item2.equals(SkyUtils.createSkyBoots())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyBoots())) {
                                     result = RainUtils.createBoots();
                                 }
-                            } else if (item1.equals(LavaUtils.createLavaBoots())) {
-                                if (item2.equals(IceUtils.createIceBoots())) {
+                            } else if (ArmourUtil.compare(item1, LavaUtils.createLavaBoots())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceBoots())) {
                                     result = PoisonUtils.createBoots();
                                 }
-                                if (item2.equals(MetalUtils.createMetalBoots())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalBoots())) {
                                     result = ObsidianUtils.createBoots();
                                 }
-                                if (item2.equals(SkyUtils.createSkyBoots())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyBoots())) {
                                     result = LightningUtils.createBoots();
                                 }
-                            } else if (item1.equals(SkyUtils.createSkyBoots())) {
-                                if (item2.equals(IceUtils.createIceBoots())) {
+                            } else if (ArmourUtil.compare(item1, SkyUtils.createSkyBoots())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceBoots())) {
                                     result = RainUtils.createBoots();
                                 }
-                                if (item2.equals(MetalUtils.createMetalBoots())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalBoots())) {
                                     result = SandUtils.createBoots();
                                 }
-                                if (item2.equals(LavaUtils.createLavaBoots())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaBoots())) {
                                     result = LightningUtils.createBoots();
                                 }
-                            } else if (item1.equals(MetalUtils.createMetalBoots())) {
-                                if (item2.equals(IceUtils.createIceBoots())) {
+                            } else if (ArmourUtil.compare(item1, MetalUtils.createMetalBoots())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceBoots())) {
                                     result = FreezeUtils.createBoots();
                                 }
-                                if (item2.equals(SkyUtils.createSkyBoots())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyBoots())) {
                                     result = SandUtils.createBoots();
                                 }
-                                if (item2.equals(LavaUtils.createLavaBoots())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaBoots())) {
                                     result = ObsidianUtils.createBoots();
                                 }
                             }
-                            if (item1.equals(IceUtils.createIceLeggings())) {
-                                if (item2.equals(LavaUtils.createLavaLeggings())) {
+                            if (ArmourUtil.compare(item1, IceUtils.createIceLeggings())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaLeggings())) {
                                     result = PoisonUtils.createLeggings();
                                 }
-                                if (item2.equals(MetalUtils.createMetalLeggings())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalLeggings())) {
                                     result = FreezeUtils.createLeggings();
                                 }
-                                if (item2.equals(SkyUtils.createSkyLeggings())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyLeggings())) {
                                     result = RainUtils.createLeggings();
                                 }
-                            } else if (item1.equals(LavaUtils.createLavaLeggings())) {
-                                if (item2.equals(IceUtils.createIceLeggings())) {
+                            } else if (ArmourUtil.compare(item1, LavaUtils.createLavaLeggings())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceLeggings())) {
                                     result = PoisonUtils.createLeggings();
                                 }
-                                if (item2.equals(MetalUtils.createMetalLeggings())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalLeggings())) {
                                     result = ObsidianUtils.createLeggings();
                                 }
-                                if (item2.equals(SkyUtils.createSkyLeggings())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyLeggings())) {
                                     result = LightningUtils.createLeggings();
                                 }
-                            } else if (item1.equals(SkyUtils.createSkyLeggings())) {
-                                if (item2.equals(IceUtils.createIceLeggings())) {
+                            } else if (ArmourUtil.compare(item1, SkyUtils.createSkyLeggings())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceLeggings())) {
                                     result = RainUtils.createLeggings();
                                 }
-                                if (item2.equals(MetalUtils.createMetalLeggings())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalLeggings())) {
                                     result = SandUtils.createLeggings();
                                 }
-                                if (item2.equals(LavaUtils.createLavaLeggings())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaLeggings())) {
                                     result = LightningUtils.createLeggings();
                                 }
-                            } else if (item1.equals(MetalUtils.createMetalLeggings())) {
-                                if (item2.equals(IceUtils.createIceLeggings())) {
+                            } else if (ArmourUtil.compare(item1, MetalUtils.createMetalLeggings())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceLeggings())) {
                                     result = FreezeUtils.createLeggings();
                                 }
-                                if (item2.equals(SkyUtils.createSkyLeggings())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyLeggings())) {
                                     result = SandUtils.createLeggings();
                                 }
-                                if (item2.equals(LavaUtils.createLavaLeggings())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaLeggings())) {
                                     result = ObsidianUtils.createLeggings();
                                 }
                             }
-                            if (item1.equals(IceUtils.createIceChestplate())) {
-                                if (item2.equals(LavaUtils.createLavaChestplate())) {
+                            if (ArmourUtil.compare(item1, IceUtils.createIceChestplate())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaChestplate())) {
                                     result = PoisonUtils.createChestplate();
                                 }
-                                if (item2.equals(MetalUtils.createMetalChestplate())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalChestplate())) {
                                     result = FreezeUtils.createChestplate();
                                 }
-                                if (item2.equals(SkyUtils.createSkyChestplate())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyChestplate())) {
                                     result = RainUtils.createChestplate();
                                 }
-                            } else if (item1.equals(LavaUtils.createLavaChestplate())) {
-                                if (item2.equals(IceUtils.createIceChestplate())) {
+                            } else if (ArmourUtil.compare(item1, LavaUtils.createLavaChestplate())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceChestplate())) {
                                     result = PoisonUtils.createChestplate();
                                 }
-                                if (item2.equals(MetalUtils.createMetalChestplate())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalChestplate())) {
                                     result = ObsidianUtils.createChestplate();
                                 }
-                                if (item2.equals(SkyUtils.createSkyChestplate())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyChestplate())) {
                                     result = LightningUtils.createChestplate();
                                 }
-                            } else if (item1.equals(SkyUtils.createSkyChestplate())) {
-                                if (item2.equals(IceUtils.createIceChestplate())) {
+                            } else if (ArmourUtil.compare(item1, SkyUtils.createSkyChestplate())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceChestplate())) {
                                     result = RainUtils.createChestplate();
                                 }
-                                if (item2.equals(MetalUtils.createMetalChestplate())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalChestplate())) {
                                     result = SandUtils.createChestplate();
                                 }
-                                if (item2.equals(LavaUtils.createLavaChestplate())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaChestplate())) {
                                     result = LightningUtils.createChestplate();
                                 }
-                            } else if (item1.equals(MetalUtils.createMetalChestplate())) {
-                                if (item2.equals(IceUtils.createIceChestplate())) {
+                            } else if (ArmourUtil.compare(item1, MetalUtils.createMetalChestplate())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceChestplate())) {
                                     result = FreezeUtils.createChestplate();
                                 }
-                                if (item2.equals(SkyUtils.createSkyChestplate())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyChestplate())) {
                                     result = SandUtils.createChestplate();
                                 }
-                                if (item2.equals(LavaUtils.createLavaChestplate())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaChestplate())) {
                                     result = ObsidianUtils.createChestplate();
                                 }
                             }
-                            if (item1.equals(IceUtils.createIceHelmet())) {
-                                if (item2.equals(LavaUtils.createLavaHelmet())) {
+                            if (ArmourUtil.compare(item1, IceUtils.createIceHelmet())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaHelmet())) {
                                     result = PoisonUtils.createHelmet();
                                 }
-                                if (item2.equals(MetalUtils.createMetalHelmet())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalHelmet())) {
                                     result = FreezeUtils.createHelmet();
                                 }
-                                if (item2.equals(SkyUtils.createSkyHelmet())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyHelmet())) {
                                     result = RainUtils.createHelmet();
                                 }
-                            } else if (item1.equals(LavaUtils.createLavaHelmet())) {
-                                if (item2.equals(IceUtils.createIceHelmet())) {
+                            } else if (ArmourUtil.compare(item1, LavaUtils.createLavaHelmet())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceHelmet())) {
                                     result = PoisonUtils.createHelmet();
                                 }
-                                if (item2.equals(MetalUtils.createMetalHelmet())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalHelmet())) {
                                     result = ObsidianUtils.createHelmet();
                                 }
-                                if (item2.equals(SkyUtils.createSkyHelmet())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyHelmet())) {
                                     result = LightningUtils.createHelmet();
                                 }
-                            } else if (item1.equals(SkyUtils.createSkyHelmet())) {
-                                if (item2.equals(IceUtils.createIceHelmet())) {
+                            } else if (ArmourUtil.compare(item1, SkyUtils.createSkyHelmet())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceHelmet())) {
                                     result = RainUtils.createHelmet();
                                 }
-                                if (item2.equals(MetalUtils.createMetalHelmet())) {
+                                if (ArmourUtil.compare(item2, MetalUtils.createMetalHelmet())) {
                                     result = SandUtils.createHelmet();
                                 }
-                                if (item2.equals(LavaUtils.createLavaHelmet())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaHelmet())) {
                                     result = LightningUtils.createHelmet();
                                 }
-                            } else if (item1.equals(MetalUtils.createMetalHelmet())) {
-                                if (item2.equals(IceUtils.createIceHelmet())) {
+                            } else if (ArmourUtil.compare(item1, MetalUtils.createMetalHelmet())) {
+                                if (ArmourUtil.compare(item2, IceUtils.createIceHelmet())) {
                                     result = FreezeUtils.createHelmet();
                                 }
-                                if (item2.equals(SkyUtils.createSkyHelmet())) {
+                                if (ArmourUtil.compare(item2, SkyUtils.createSkyHelmet())) {
                                     result = SandUtils.createHelmet();
                                 }
-                                if (item2.equals(LavaUtils.createLavaHelmet())) {
+                                if (ArmourUtil.compare(item2, LavaUtils.createLavaHelmet())) {
                                     result = ObsidianUtils.createHelmet();
                                 }
                             }

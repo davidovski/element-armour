@@ -31,23 +31,18 @@ public class LightningUtils {
     }
 
     public static void constantPlayerChecks(Player p) {
-        p.setFireTicks(-1);
+
         if ((checkForBoots(p)) && (p.isSneaking()) && (!p.isOnGround())) {
             p.setFallDistance(0.0F);
             if (p.getVelocity().getY() < 0.0D) {
-                p.getWorld().strikeLightning(p.getLocation().add(4.0D, 0.0D, 0.0D));
-                p.getWorld().strikeLightning(p.getLocation().add(2.0D, 0.0D, 2.0D));
-                p.getWorld().strikeLightning(p.getLocation().add(0.0D, 0.0D, 4.0D));
-                p.getWorld().strikeLightning(p.getLocation().add(2.0D, 0.0D, -2.0D));
-                p.getWorld().strikeLightning(p.getLocation().add(4.0D, 0.0D, -4.0D));
-                p.getWorld().strikeLightning(p.getLocation().add(-4.0D, 0.0D, -4.0D));
-                p.getWorld().strikeLightning(p.getLocation().add(-2.0D, 0.0D, -2.0D));
-                p.getWorld().strikeLightning(p.getLocation().add(-2.0D, 0.0D, 2.0D));
-                p.setVelocity(new org.bukkit.util.Vector(0, -3, 0));
+                p.setVelocity(p.getLocation().getDirection().setY(0));
+
             }
         }
 
         if (checkForChestplate(p)) {
+            p.setFireTicks(-1);
+            p.setFallDistance(0);
             p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, 40, 2));
             p.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 200, 2));
         }

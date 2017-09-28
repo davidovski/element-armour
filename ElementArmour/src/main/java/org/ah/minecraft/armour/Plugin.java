@@ -17,12 +17,15 @@ import org.ah.minecraft.armour.mobs.ChaserController;
 import org.ah.minecraft.armour.mobs.EntityTypeController;
 import org.ah.minecraft.armour.mobs.EyeController;
 import org.ah.minecraft.armour.mobs.GhostController;
+import org.ah.minecraft.armour.mobs.HorseRiderController;
 import org.ah.minecraft.armour.mobs.KnightController;
+import org.ah.minecraft.armour.mobs.LeprechaunController;
 import org.ah.minecraft.armour.mobs.MinerController;
-import org.ah.minecraft.armour.mobs.MobUtils;
 import org.ah.minecraft.armour.mobs.MonkeyController;
+import org.ah.minecraft.armour.mobs.PenguinController;
 import org.ah.minecraft.armour.mobs.RedGuardianController;
 import org.ah.minecraft.armour.mobs.SkeletonFarmerController;
+import org.ah.minecraft.armour.mobs.TimeKeeperController;
 import org.ah.minecraft.armour.mobs.VampireController;
 import org.ah.minecraft.armour.mobs.WeightedEntityController;
 import org.ah.minecraft.armour.mobs.WispController;
@@ -35,6 +38,7 @@ import org.ah.minecraft.armour.utils.FreezeUtils;
 import org.ah.minecraft.armour.utils.FrostedBlock;
 import org.ah.minecraft.armour.utils.IceUtils;
 import org.ah.minecraft.armour.utils.LavaUtils;
+import org.ah.minecraft.armour.utils.LightUtils;
 import org.ah.minecraft.armour.utils.LightningUtils;
 import org.ah.minecraft.armour.utils.MetalUtils;
 import org.ah.minecraft.armour.utils.ObsidianUtils;
@@ -42,6 +46,7 @@ import org.ah.minecraft.armour.utils.PoisonUtils;
 import org.ah.minecraft.armour.utils.RainUtils;
 import org.ah.minecraft.armour.utils.SandUtils;
 import org.ah.minecraft.armour.utils.SkyUtils;
+import org.ah.minecraft.armour.utils.ToolUtils;
 import org.ah.minecraft.armour.utils.WaterUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -51,11 +56,9 @@ import org.bukkit.Difficulty;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -63,8 +66,6 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.Dispenser;
 import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarFlag;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -130,6 +131,8 @@ public final class Plugin extends JavaPlugin implements Listener {
     private BossBar bb;
     public static List<FrostedBlock> s = new ArrayList<FrostedBlock>();
 
+    public List<RecurBreak> breaks;
+
     @Override
     public void onEnable() {
         Bukkit.getLogger().info("Element Armour has been enabled!");
@@ -143,14 +146,20 @@ public final class Plugin extends JavaPlugin implements Listener {
         holdingblock = new HashMap();
         punchDelay = new HashMap();
 
+        breaks = new ArrayList<RecurBreak>();
+
         loadAll(this);
 
         controllers = new ArrayList();
         nethercontrollers = new ArrayList();
+        controllers.add(new org.ah.minecraft.armour.mobs.UndeathController(1));
         controllers.add(new BanditController(90));
+        controllers.add(new PenguinController(150));
         controllers.add(new BouncerController(40));
-
+        controllers.add(new LeprechaunController(90));
+        controllers.add(new HorseRiderController(60));
         controllers.add(new GhostController(60));
+        controllers.add(new TimeKeeperController(100));
         controllers.add(new KnightController(70));
         controllers.add(new BloodBatController(0));
         controllers.add(new BloodRatController(0));
@@ -168,8 +177,7 @@ public final class Plugin extends JavaPlugin implements Listener {
         controllers.add(new VampireController(60));
         controllers.add(new EyeController(40));
 
-        controllers.add(new WispController(10));
-        controllers.add(new org.ah.minecraft.armour.mobs.UndeathController(1));
+        controllers.add(new WispController(40));
 
         nethercontrollers.add(new org.ah.minecraft.armour.mobs.NetherKnightController(70));
         nethercontrollers.add(new org.ah.minecraft.armour.mobs.DeamonController(50));
@@ -303,6 +311,18 @@ public final class Plugin extends JavaPlugin implements Listener {
                 p.getInventory().addItem(new ItemStack[] { DarkUtils.createLeggings() });
                 return true;
             }
+            if (cmd.getName().equalsIgnoreCase("Light")) {
+                p.getInventory().addItem(new ItemStack[] { LightUtils.createBoots() });
+                p.getInventory().addItem(new ItemStack[] { LightUtils.createChestplate() });
+                p.getInventory().addItem(new ItemStack[] { LightUtils.createHelmet() });
+                p.getInventory().addItem(new ItemStack[] { LightUtils.createLeggings() });
+                return true;
+            }
+            if (cmd.getName().equalsIgnoreCase("Tools")) {
+                p.getInventory().addItem(ToolUtils.createAxe());
+                p.getInventory().addItem(ToolUtils.createPickaxe());
+                return true;
+            }
             if (cmd.getName().equalsIgnoreCase("Rain")) {
                 p.getInventory().addItem(new ItemStack[] { RainUtils.createBoots() });
                 p.getInventory().addItem(new ItemStack[] { RainUtils.createChestplate() });
@@ -392,10 +412,8 @@ public final class Plugin extends JavaPlugin implements Listener {
                         return true;
                     }
                     if (cmd.getName().equalsIgnoreCase("Ninja")) {
-                        p.getInventory().addItem(new ItemStack[] { Ninja.createShurikenItemStack() });
-                        p.getInventory().addItem(new ItemStack[] { ArmourUtil.createDarkEssence() });
-                        p.getInventory().addItem(new ItemStack[] { ArmourUtil.createLightEssence() });
-                        p.getAdvancementProgress(Bukkit.getAdvancement(new NamespacedKey(this, "elementArmour/must_rewawrd"))).awardCriteria("do");
+                        LeprechaunController leprechaunController = new LeprechaunController(0);
+                        leprechaunController.spawn(p.getLocation());
                         return true;
                     }
                     if (cmd.getName().equalsIgnoreCase("Bouncer")) {
@@ -498,6 +516,8 @@ public final class Plugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onPlayerInteractEntity(PlayerInteractAtEntityEvent event) {
         FreezeUtils.onPlayerInteractEntity(event, this);
+        DarkUtils.onClick(event);
+        LightUtils.onClick(event);
     }
 
     public static void hakaiOutToChat(String message) {
@@ -636,6 +656,7 @@ public final class Plugin extends JavaPlugin implements Listener {
                     ObsidianUtils.checkPunch(p);
                     RainUtils.checkPunch(p);
                     DarkUtils.checkPunch(p);
+                    LightUtils.checkPunch(p);
                     punchDelay.put(p, Integer.valueOf(5));
                 }
 
@@ -686,6 +707,14 @@ public final class Plugin extends JavaPlugin implements Listener {
         CombiningUtil.crafterCheck(this);
         boolean hasBoss = false;
 
+        Iterator<RecurBreak> it1 = breaks.iterator();
+        while (it1.hasNext()) {
+            RecurBreak next = it1.next();
+            if (next.iterate()) {
+                it1.remove();
+            }
+        }
+
         Iterator<FrostedBlock> it = s.iterator();
         while (it.hasNext()) {
             FrostedBlock next = it.next();
@@ -697,8 +726,19 @@ public final class Plugin extends JavaPlugin implements Listener {
         for (World w : Bukkit.getWorlds()) {
             for (Entity entity : w.getEntities()) {
 
+
                 if ((entity instanceof LivingEntity)) {
                     LivingEntity e = (LivingEntity) entity;
+                    if (e.hasPotionEffect(PotionEffectType.CONFUSION) && !(e instanceof Player)) {
+                        Random r = new Random();
+                        Location location = entity.getLocation();
+                        location.setPitch(r.nextInt(360)-180);
+                        location.setYaw(r.nextInt(360)-180);
+                        e.teleport(location);
+                        if (e.isOnGround()) {
+                            e.setVelocity(new Vector(0, 0.25, 0));
+                        }
+                    }
                     for (EntityTypeController c : controllers) {
                         c.checkAndUpdate(e);
                     }
@@ -707,7 +747,7 @@ public final class Plugin extends JavaPlugin implements Listener {
                     }
                     if ("Hakai".equals(e.getCustomName())) {
                         Skeleton hakai = (Skeleton) e;
-
+                        e.setAI(true);
                         hasBoss = true;
                         if (bb != null) {
                             for (Player player : getServer().getOnlinePlayers()) {
@@ -854,59 +894,60 @@ public final class Plugin extends JavaPlugin implements Listener {
                         }
                     } else if (is.getType() == Material.TOTEM) {
                         Block bl = i.getLocation().getBlock();
-                        if ((i.getLocation().getBlock().getType() == Material.CAULDRON) && (is.hasItemMeta()) && ("Hakai".equals(is.getItemMeta().getDisplayName()))) {
-                            List<Block> stairs = new ArrayList<Block>();
-                            ((List) stairs).add(bl.getLocation().add(1.0D, -1.0D, 0.0D).getBlock());
-                            ((List) stairs).add(bl.getLocation().add(-1.0D, -1.0D, 0.0D).getBlock());
-                            ((List) stairs).add(bl.getLocation().add(0.0D, -1.0D, -1.0D).getBlock());
-                            ((List) stairs).add(bl.getLocation().add(0.0D, -1.0D, 1.0D).getBlock());
-                            if (areAllOneType(Material.NETHER_BRICK_STAIRS, stairs)) {
-                                i.remove();
-                                for (Block block : stairs) {
-                                    block.getWorld().createExplosion(block.getLocation(), 4.0F);
-                                }
 
-                                Skeleton skeleton = (Skeleton) i.getWorld().spawnEntity(i.getLocation(), EntityType.SKELETON);
-                                EntityEquipment eq = skeleton.getEquipment();
-                                int r = 50;
-
-                                ItemStack body = new ItemStack(Material.LEATHER_CHESTPLATE);
-                                LeatherArmorMeta bmeta = (LeatherArmorMeta) body.getItemMeta();
-                                bmeta.setColor(Color.fromRGB(r, 0, 0));
-                                body.setItemMeta(bmeta);
-
-                                ItemStack legs = new ItemStack(Material.LEATHER_LEGGINGS);
-                                LeatherArmorMeta lmeta = (LeatherArmorMeta) legs.getItemMeta();
-                                lmeta.setColor(Color.fromRGB(r, 0, 0));
-                                legs.setItemMeta(lmeta);
-
-                                ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
-                                LeatherArmorMeta bometa = (LeatherArmorMeta) boots.getItemMeta();
-                                bometa.setColor(Color.fromRGB(r, 0, 0));
-                                boots.setItemMeta(bometa);
-
-                                eq.setHelmet(new ItemStack(Material.NETHER_BRICK));
-                                eq.setChestplate(body);
-                                eq.setLeggings(legs);
-                                eq.setBoots(boots);
-
-                                skeleton.setCustomName("Hakai");
-
-                                eq.setItemInMainHand(new ItemStack(Material.STICK));
-                                eq.setItemInOffHand(new ItemStack(Material.STICK));
-
-                                MobUtils.setMaxHealth(skeleton, 1000.0D);
-                                skeleton.setHealth(1000.0D);
-                                skeleton.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(4.0D);
-
-                                skeleton.setRemoveWhenFarAway(false);
-                                bb = Bukkit.createBossBar("Hakai", BarColor.RED, BarStyle.SOLID, new BarFlag[] { BarFlag.CREATE_FOG });
-                                hakaiOutToChat("You have awoken me from my slumber!");
-                                for (Player player : getServer().getOnlinePlayers()) {
-                                    bb.addPlayer(player);
-                                }
-                            }
-                        }
+//                        if ((i.getLocation().getBlock().getType() == Material.CAULDRON) && (is.hasItemMeta()) && ("Hakai".equals(is.getItemMeta().getDisplayName()))) {
+//                            List<Block> stairs = new ArrayList<Block>();
+//                            ((List) stairs).add(bl.getLocation().add(1.0D, -1.0D, 0.0D).getBlock());
+//                            ((List) stairs).add(bl.getLocation().add(-1.0D, -1.0D, 0.0D).getBlock());
+//                            ((List) stairs).add(bl.getLocation().add(0.0D, -1.0D, -1.0D).getBlock());
+//                            ((List) stairs).add(bl.getLocation().add(0.0D, -1.0D, 1.0D).getBlock());
+//                            if (areAllOneType(Material.NETHER_BRICK_STAIRS, stairs)) {
+//                                i.remove();
+//                                for (Block block : stairs) {
+//                                    block.getWorld().createExplosion(block.getLocation(), 4.0F);
+//                                }
+//
+//                                Skeleton skeleton = (Skeleton) i.getWorld().spawnEntity(i.getLocation(), EntityType.SKELETON);
+//                                EntityEquipment eq = skeleton.getEquipment();
+//                                int r = 50;
+//
+//                                ItemStack body = new ItemStack(Material.LEATHER_CHESTPLATE);
+//                                LeatherArmorMeta bmeta = (LeatherArmorMeta) body.getItemMeta();
+//                                bmeta.setColor(Color.fromRGB(r, 0, 0));
+//                                body.setItemMeta(bmeta);
+//
+//                                ItemStack legs = new ItemStack(Material.LEATHER_LEGGINGS);
+//                                LeatherArmorMeta lmeta = (LeatherArmorMeta) legs.getItemMeta();
+//                                lmeta.setColor(Color.fromRGB(r, 0, 0));
+//                                legs.setItemMeta(lmeta);
+//
+//                                ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
+//                                LeatherArmorMeta bometa = (LeatherArmorMeta) boots.getItemMeta();
+//                                bometa.setColor(Color.fromRGB(r, 0, 0));
+//                                boots.setItemMeta(bometa);
+//
+//                                eq.setHelmet(new ItemStack(Material.NETHER_BRICK));
+//                                eq.setChestplate(body);
+//                                eq.setLeggings(legs);
+//                                eq.setBoots(boots);
+//
+//                                skeleton.setCustomName("Hakai");
+//
+//                                eq.setItemInMainHand(new ItemStack(Material.STICK));
+//                                eq.setItemInOffHand(new ItemStack(Material.STICK));
+//
+//                                MobUtils.setMaxHealth(skeleton, 1000.0D);
+//                                skeleton.setHealth(1000.0D);
+//                                skeleton.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(4.0D);
+//
+//                                skeleton.setRemoveWhenFarAway(false);
+//                                bb = Bukkit.createBossBar("Hakai", BarColor.RED, BarStyle.SOLID, new BarFlag[] { BarFlag.CREATE_FOG });
+//                                hakaiOutToChat("You have awoken me from my slumber!");
+//                                for (Player player : getServer().getOnlinePlayers()) {
+//                                    bb.addPlayer(player);
+//                                }
+//                            }
+//                        }
                     }
                 }
             }
@@ -929,6 +970,7 @@ public final class Plugin extends JavaPlugin implements Listener {
                 }
                 ObsidianUtils.constantPlayerChecks(p);
                 DarkUtils.constantPlayerChecks(p);
+                LightUtils.constantPlayerChecks(p);
                 RainUtils.constantPlayerChecks(p);
                 WaterUtils.constantPlayerChecks(p);
                 FireUtils.constantPlayerChecks(p);
@@ -986,14 +1028,23 @@ public final class Plugin extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
+        if (event.getEntity().getKiller() != null) {
+        event.getDrops().add(ItemUtils.getSkull(event.getEntity().getDisplayName()));
+        }
     }
 
     @EventHandler
     public void onHurt(EntityDamageEvent event) {
         if ((event.getEntity() instanceof Player)) {
             Player p = (Player) event.getEntity();
-            if (SkyUtils.checkForBoots(p) && (event.getCause() == DamageCause.FLY_INTO_WALL || event.getCause() == DamageCause.FALL)) {
+            if ((RainUtils.checkForBoots(p) ||SkyUtils.checkForBoots(p) || DarkUtils.checkForBoots(p) || LightUtils.checkForBoots(p)) && (event.getCause() == DamageCause.FLY_INTO_WALL || event.getCause() == DamageCause.FALL)) {
                 event.setCancelled(true);
+                return;
+            }
+
+            if ((SkyUtils.checkForBoots(p))) {
+                p.setGliding(false);
+
             }
             if ((LightningUtils.checkForHelmet(p)) && (event.getCause() == EntityDamageEvent.DamageCause.LIGHTNING)) {
                 event.setCancelled(true);
@@ -1211,7 +1262,7 @@ public final class Plugin extends JavaPlugin implements Listener {
     public void toggleGlideEvent(EntityToggleGlideEvent event) {
         if ((event.getEntity() instanceof Player)) {
             Player p = (Player) event.getEntity();
-            if (((SkyUtils.checkForBoots(p)) || DarkUtils.checkForBoots(p)) && (p.isGliding())) {
+            if (((SkyUtils.checkForBoots(p) || RainUtils.checkForBoots(p)) || DarkUtils.checkForBoots(p) || LightUtils.checkForBoots(p)) && (p.isGliding())) {
                 if (!p.isOnGround()) {
                     event.setCancelled(true);
                     p.setGliding(true);
@@ -1496,6 +1547,11 @@ public final class Plugin extends JavaPlugin implements Listener {
             c.spawn(event.getEntity().getLocation());
         }
 
+        if (("Undeath".equals(event.getDamager().getCustomName()))) {
+            event.getEntity()
+            .setVelocity(new Vector(0, 64, 0));
+        }
+
         if ("Hakai".equals(event.getEntity().getCustomName())) {
             event.getEntity().getWorld().playSound(event.getEntity().getLocation(), Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
         }
@@ -1516,14 +1572,15 @@ public final class Plugin extends JavaPlugin implements Listener {
             Zombie z = (Zombie) event.getDamager();
             if ((event.getEntity() instanceof Player)) {
                 Player p = (Player) event.getEntity();
-                if ((z.getEquipment().getItemInMainHand().getType() == Material.WOOD_SWORD) && (p.getEquipment().getItemInMainHand().getType() != Material.WOOD_SWORD)
-                        && (p.getEquipment().getItemInMainHand().getType().toString().contains("SWORD"))) {
-                    z.getEquipment().setItemInMainHand(p.getItemInHand());
-                    z.getEquipment().setItemInMainHandDropChance(1.0F);
-                    p.getItemInHand().setType(Material.AIR);
-                    p.getItemInHand().setType(Material.WOOD_SWORD);
-                    p.getItemInHand().setDurability((short) 0);
+                Random random = new Random();
+                int nextInt = random.nextInt(p.getInventory().getSize());
+                ItemStack item = p.getInventory().getItem(nextInt);
+                if (item != null) {
+                Item dropped = p.getLocation().getWorld().dropItemNaturally(p.getLocation(), item);
+                dropped.setPickupDelay(20);
+                p.getInventory().setItem(nextInt, null);
                 }
+
             }
         }
     }
@@ -1531,6 +1588,19 @@ public final class Plugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onbreak(BlockBreakEvent event) {
         Block b = event.getBlock();
+        if (ArmourUtil.compare(ToolUtils.createAxe(), event.getPlayer().getItemInHand())) {
+            if (b.getType() == Material.LOG || b.getType() == Material.LOG_2) {
+                event.setCancelled(true);
+                breaks.add(new RecurBreak(b, event.getPlayer().getItemInHand(), false));
+            }
+        }
+
+        if (ArmourUtil.compare(ToolUtils.createPickaxe(), event.getPlayer().getItemInHand())) {
+            if (b.getType().toString().contains("ORE")) {
+                event.setCancelled(true);
+                breaks.add(new RecurBreak(b, event.getPlayer().getItemInHand(), true));
+            }
+        }
         if (b.getType() == Material.LONG_GRASS) {
             Random random = new Random();
             if (random.nextInt(20) == 0) {
@@ -1553,6 +1623,7 @@ public final class Plugin extends JavaPlugin implements Listener {
         LavaUtils.onMove(e);
         IceUtils.onMove(e);
         DarkUtils.onMove(e);
+        LightUtils.onMove(e);
 
         Player p = e.getPlayer();
         for (Entity entity : p.getNearbyEntities(1.0D, 1.0D, 1.0D)) {

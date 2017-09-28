@@ -50,6 +50,8 @@ public class ConstructionControlPanel implements Listener {
 
         inv.setItem(0, ItemUtils.getCustomItem(Material.BARRIER, ChatColor.RED + "Delete Contructor"));
         icons.add(new MachineItem(MachineType.BREAK));
+        icons.add(new MachineItem(MachineType.PLACE));
+        icons.add(new MachineItem(MachineType.FARM));
 
         for (MachineItem machineItem : icons) {
             inv.addItem(machineItem);

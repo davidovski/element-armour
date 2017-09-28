@@ -3,7 +3,8 @@ package org.ah.minecraft.machines;
 public enum MachineType {
     IDLE(0),
     BREAK(1),
-    PLACE(2);
+    PLACE(2),
+    FARM(3);
 
     private int numVal;
 

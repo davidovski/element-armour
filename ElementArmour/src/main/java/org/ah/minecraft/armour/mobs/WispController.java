@@ -63,7 +63,7 @@ public class WispController extends CustomEntityController {
     @Override
     public List<ItemStack> getDrops() {
         List<ItemStack> drops = new ArrayList();
-        drops.add(DropGenerator.i(ArmourUtil.createLightEssence(), 2));
+        drops.add(DropGenerator.i(ArmourUtil.createLightEssence(), 3));
         return drops;
     }
 }

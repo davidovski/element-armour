@@ -14,6 +14,16 @@ commands:
       usage: /Dark
       permission: armour.debug
       permission-message: You don't have <permission>
+   Light:
+      description: Light
+      usage: /Light
+      permission: armour.debug
+      permission-message: You don't have <permission>
+   Tools:
+      description: Tools
+      usage: /Tools
+      permission: armour.debug
+      permission-message: You don't have <permission>
    Earth:
       description: Earth
       usage: /Earth

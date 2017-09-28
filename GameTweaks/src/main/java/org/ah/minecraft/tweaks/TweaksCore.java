@@ -19,7 +19,6 @@ public final class TweaksCore extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
 
         tweaks = new ArrayList<Tweak>();
-        tweaks.add(new AnimalBreading());
         tweaks.add(new TenHourSleep());
         tweaks.add(new DiggingTreasure());
         tweaks.add(new DelicateGlass());
