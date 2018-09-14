@@ -24,7 +24,7 @@ public class ToolUtils {
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         pickaxe.setItemMeta(meta);
 
-        pickaxe.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+        pickaxe.addUnsafeEnchantment(Enchantment.DURABILITY, 5);
         pickaxe.addEnchantment(Enchantment.DIG_SPEED, 3);
         pickaxe.addEnchantment(Enchantment.SILK_TOUCH, 1);
         return pickaxe;
@@ -42,7 +42,7 @@ public class ToolUtils {
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         axe.setItemMeta(meta);
 
-        axe.addUnsafeEnchantment(Enchantment.DURABILITY, 10);
+        axe.addUnsafeEnchantment(Enchantment.DURABILITY, 5);
         axe.addEnchantment(Enchantment.DIG_SPEED, 3);
         return axe;
     }

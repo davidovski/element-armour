@@ -25,6 +25,7 @@ import org.ah.minecraft.armour.mobs.MonkeyController;
 import org.ah.minecraft.armour.mobs.PenguinController;
 import org.ah.minecraft.armour.mobs.RedGuardianController;
 import org.ah.minecraft.armour.mobs.SkeletonFarmerController;
+import org.ah.minecraft.armour.mobs.StoneController;
 import org.ah.minecraft.armour.mobs.TimeKeeperController;
 import org.ah.minecraft.armour.mobs.VampireController;
 import org.ah.minecraft.armour.mobs.WeightedEntityController;
@@ -159,6 +160,9 @@ public final class Plugin extends JavaPlugin implements Listener {
         controllers.add(new LeprechaunController(90));
         controllers.add(new HorseRiderController(60));
         controllers.add(new GhostController(60));
+
+        controllers.add(new StoneController(100));
+
         controllers.add(new TimeKeeperController(100));
         controllers.add(new KnightController(70));
         controllers.add(new BloodBatController(0));
@@ -412,8 +416,14 @@ public final class Plugin extends JavaPlugin implements Listener {
                         return true;
                     }
                     if (cmd.getName().equalsIgnoreCase("Ninja")) {
-                        LeprechaunController leprechaunController = new LeprechaunController(0);
-                        leprechaunController.spawn(p.getLocation());
+                        p.getInventory().addItem(EarthUtils.makeEssence());
+                        p.getInventory().addItem(WaterUtils.makeEssence());
+                        p.getInventory().addItem(AirUtils.makeEssence());
+                        p.getInventory().addItem(FireUtils.makeEssence());
+
+                        p.getInventory().addItem(ArmourUtil.createLightEssence());
+                        p.getInventory().addItem(ArmourUtil.createDarkEssence());
+                        p.getInventory().addItem(ArmourUtil.createJetBoots());
                         return true;
                     }
                     if (cmd.getName().equalsIgnoreCase("Bouncer")) {
@@ -690,8 +700,15 @@ public final class Plugin extends JavaPlugin implements Listener {
     @EventHandler
     public void onBlockFall(EntityChangeBlockEvent event) {
         Entity e = event.getEntity();
+
+        if ("r".equals(e.getCustomName())) {
+            event.setCancelled(false);
+        }
+
         if ((event.getEntityType() == EntityType.FALLING_BLOCK) && (!holdingblock.containsValue(e))) {
             Byte blockData = Byte.valueOf((byte) 5);
+
+
             if (((FallingBlock) e).getBlockData() == blockData.byteValue()) {
                 event.setCancelled(true);
                 Location explosion = e.getLocation();
@@ -726,7 +743,13 @@ public final class Plugin extends JavaPlugin implements Listener {
         for (World w : Bukkit.getWorlds()) {
             for (Entity entity : w.getEntities()) {
 
-
+                if (entity instanceof FallingBlock) {
+                    if (entity.getCustomName().equals("r")) {
+                        if (entity.getVehicle() == null) {
+                            entity.remove();
+                        }
+                    }
+                }
                 if ((entity instanceof LivingEntity)) {
                     LivingEntity e = (LivingEntity) entity;
                     if (e.hasPotionEffect(PotionEffectType.CONFUSION) && !(e instanceof Player)) {
@@ -967,6 +990,20 @@ public final class Plugin extends JavaPlugin implements Listener {
                 if (holdingblock.get(p) != null) {
                     Location targetLoc = p.getEyeLocation().add(p.getEyeLocation().getDirection().multiply(2));
                     holdingblock.get(p).setVelocity(targetLoc.subtract(holdingblock.get(p).getLocation()).toVector());
+                }
+
+                if (ArmourUtil.checkForJetBoots(p)) {
+                    if (p.isSneaking()) {
+                        p.setGliding(true);
+                        p.getWorld().playSound(p.getLocation(), Sound.BLOCK_PORTAL_TRIGGER, 1.0F, 1.0F);
+                        p.getWorld().spawnParticle(Particle.PORTAL, p.getLocation(), 100);
+
+                        Vector vec = p.getVelocity().add(p.getLocation().getDirection().multiply(0.2));
+                        if (vec.length() > 16) {
+                            vec.multiply(0.9);
+                        }
+                        p.setVelocity(vec);
+                    }
                 }
                 ObsidianUtils.constantPlayerChecks(p);
                 DarkUtils.constantPlayerChecks(p);
@@ -1262,7 +1299,7 @@ public final class Plugin extends JavaPlugin implements Listener {
     public void toggleGlideEvent(EntityToggleGlideEvent event) {
         if ((event.getEntity() instanceof Player)) {
             Player p = (Player) event.getEntity();
-            if (((SkyUtils.checkForBoots(p) || RainUtils.checkForBoots(p)) || DarkUtils.checkForBoots(p) || LightUtils.checkForBoots(p)) && (p.isGliding())) {
+            if (((ArmourUtil.checkForJetBoots(p) ||SkyUtils.checkForBoots(p) || RainUtils.checkForBoots(p)) || DarkUtils.checkForBoots(p) || LightUtils.checkForBoots(p)) && (p.isGliding())) {
                 if (!p.isOnGround()) {
                     event.setCancelled(true);
                     p.setGliding(true);

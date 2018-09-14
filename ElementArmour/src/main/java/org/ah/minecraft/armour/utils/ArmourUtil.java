@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
@@ -22,7 +23,7 @@ public class ArmourUtil {
     private static final Color GREEN = Color.fromRGB(0, 150, 20);
     private static final Color GRAY = Color.fromRGB(100, 100, 100);
     private static final Color AQUA = Color.AQUA;
-
+    private static final Color JET = Color.fromRGB(125, 22, 162);
     private ArmourUtil() {
     }
 
@@ -44,15 +45,58 @@ public class ArmourUtil {
         }
     }
 
+    public static boolean checkForJetBoots(Player p) {
+        ItemStack boots = p.getInventory().getBoots();
 
-    public static boolean compare(org.bukkit.inventory.ItemStack one,   org.bukkit.inventory.ItemStack two) {
-        if (one.getType() == two.getType()) {
-            if (one.hasItemMeta() && two.hasItemMeta()) {
-                if (one.getItemMeta().equals(two.getItemMeta())) {
-                    return true;
+        if ((boots != null) && (boots.hasItemMeta())) {
+            ItemMeta itemMeta = boots.getItemMeta();
+
+            return ("Jet Boots".equals(itemMeta.getDisplayName())) && ((itemMeta instanceof LeatherArmorMeta))
+                    && (new Integer(4).equals(boots.getEnchantments().get(Enchantment.DURABILITY))) && (JET.equals(((LeatherArmorMeta) itemMeta).getColor()));
+        }
+        return false;
+    }
+
+    public static ItemStack createJetBoots() {
+        ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
+        LeatherArmorMeta meta = (LeatherArmorMeta) boots.getItemMeta();
+        meta.setDisplayName("Jet Boots");
+
+        List<String> lores = new ArrayList();
+        lores.add(ChatColor.WHITE + "Sneak will make you fly. But fast.");
+        lores.add(ChatColor.WHITE + "   ");
+        lores.add(ChatColor.GRAY + "Set: " + ChatColor.YELLOW + "AIR");
+        lores.add(ChatColor.GRAY + "Tier ?");
+        meta.setLore(lores);
+
+        meta.setColor(JET);
+        meta.addItemFlags(new ItemFlag[] { ItemFlag.HIDE_ATTRIBUTES });
+        boots.setItemMeta(meta);
+
+        boots.addUnsafeEnchantment(Enchantment.DURABILITY, 4);
+//        boots = ArmourUtil.addEpicArmourAttributes(boots);
+        return boots;
+    }
+
+    public static boolean compare(org.bukkit.inventory.ItemStack one, org.bukkit.inventory.ItemStack two) {
+        if (one != null && two != null) {
+            try {
+                if (one.getType() == two.getType()) {
+                    if (one.hasItemMeta() && two.hasItemMeta()) {
+                        if (one.getItemMeta().getDisplayName().equals(two.getItemMeta().getDisplayName())) {
+                            if (one.getItemMeta().getItemFlags().equals(two.getItemMeta().getItemFlags())) {
+
+                                return true;
+                            }
+                        }
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
-                return false;
-            } else {return true;}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return false;
     }
@@ -70,6 +114,41 @@ public class ArmourUtil {
         healthboost.set("AttributeName", new NBTTagString("generic.armor"));
         healthboost.set("Name", new NBTTagString("generic.armor"));
         healthboost.set("Amount", new NBTTagInt(5));
+        healthboost.set("Operation", new NBTTagInt(0));
+        healthboost.set("UUIDLeast", new NBTTagInt(905983));
+        healthboost.set("UUIDMost", new NBTTagInt(18915));
+
+        if (i.getType().toString().contains("HELM")) {
+            healthboost.set("Slot", new NBTTagString("head"));
+        } else if (i.getType().toString().contains("CHEST")) {
+            healthboost.set("Slot", new NBTTagString("chest"));
+        }
+        if (i.getType().toString().contains("LEG")) {
+            healthboost.set("Slot", new NBTTagString("legs"));
+        }
+        if (i.getType().toString().contains("BOOT")) {
+            healthboost.set("Slot", new NBTTagString("feet"));
+        }
+        modifiers.add(healthboost);
+        compound.set("AttributeModifiers", modifiers);
+        nmsStack.setTag(compound);
+        i = CraftItemStack.asBukkitCopy(nmsStack);
+        return i;
+    }
+
+    public static org.bukkit.inventory.ItemStack addEpicArmourAttributes(org.bukkit.inventory.ItemStack i) {
+        net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(i);
+        NBTTagCompound compound = nmsStack.getTag();
+        if (compound == null) {
+            compound = new NBTTagCompound();
+            nmsStack.setTag(compound);
+            compound = nmsStack.getTag();
+        }
+        NBTTagList modifiers = new NBTTagList();
+        NBTTagCompound healthboost = new NBTTagCompound();
+        healthboost.set("AttributeName", new NBTTagString("generic.armor"));
+        healthboost.set("Name", new NBTTagString("generic.armor"));
+        healthboost.set("Amount", new NBTTagInt(20));
         healthboost.set("Operation", new NBTTagInt(0));
         healthboost.set("UUIDLeast", new NBTTagInt(905983));
         healthboost.set("UUIDMost", new NBTTagInt(18915));
@@ -127,7 +206,7 @@ public class ArmourUtil {
         org.bukkit.inventory.ItemStack item = new org.bukkit.inventory.ItemStack(Material.QUARTZ, 1);
 
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatColor.WHITE + "" + ChatColor.MAGIC +  "!!!" + ChatColor.RESET + ChatColor.WHITE + "Light Essence" + ChatColor.MAGIC  +  "!!!");
+        meta.setDisplayName(ChatColor.WHITE + "" + ChatColor.MAGIC + "!!!" + ChatColor.RESET + ChatColor.WHITE + "Light Essence" + ChatColor.MAGIC + "!!!");
 
         List<String> lores = new ArrayList();
         lores.add(ChatColor.WHITE + "" + ChatColor.MAGIC + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -136,7 +215,6 @@ public class ArmourUtil {
         lores.add(ChatColor.WHITE + "" + ChatColor.MAGIC + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         lores.add(ChatColor.WHITE + "" + ChatColor.MAGIC + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         lores.add(ChatColor.WHITE + "" + ChatColor.MAGIC + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-
 
         meta.setLore(lores);
 
@@ -152,7 +230,7 @@ public class ArmourUtil {
         org.bukkit.inventory.ItemStack item = new org.bukkit.inventory.ItemStack(Material.COAL, 1, (short) 1);
 
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(ChatColor.BLACK + "" + ChatColor.MAGIC +  "!!!" + ChatColor.RESET + ChatColor.BLACK + "Dark Essence" + ChatColor.MAGIC +  "!!!");
+        meta.setDisplayName(ChatColor.BLACK + "" + ChatColor.MAGIC + "!!!" + ChatColor.RESET + ChatColor.BLACK + "Dark Essence" + ChatColor.MAGIC + "!!!");
 
         List<String> lores = new ArrayList();
         lores.add(ChatColor.BLACK + "" + ChatColor.MAGIC + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");

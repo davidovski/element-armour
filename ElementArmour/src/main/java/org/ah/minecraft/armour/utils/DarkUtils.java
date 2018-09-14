@@ -216,7 +216,7 @@ public class DarkUtils {
         boots.setItemMeta(meta);
 
         boots.addUnsafeEnchantment(Enchantment.DURABILITY, 4);
-        boots = ArmourUtil.addArmourAttributes(boots);
+        boots = ArmourUtil.addEpicArmourAttributes(boots);
         return boots;
     }
 

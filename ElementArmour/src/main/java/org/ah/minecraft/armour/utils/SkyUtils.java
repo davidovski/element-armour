@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.enchantments.Enchantment;
@@ -31,6 +32,7 @@ public class SkyUtils
   {
     if (checkForHelmet(p)) {
       Location loc = p.getLocation();
+      p.getWorld().spawnParticle(Particle.CLOUD, p.getLocation(), 500);
       p.getWorld().playSound(p.getLocation(), Sound.ENTITY_GHAST_SHOOT, 1.0F, 1.0F);
       for (Entity e : p.getNearbyEntities(10.0D, 10.0D, 10.0D)) {
         if (!e.equals(p)) {

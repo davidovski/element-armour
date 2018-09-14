@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.ah.minecraft.armour.ItemUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -43,6 +45,16 @@ public class WaterUtils {
                 bl2.setType(Material.WATER);
                 bl2.setData((byte) 15);
 
+
+                Location loca = new Location(tb.getWorld(), tb.getX() + 1, tb.getY() + 1, tb.getZ() + 1);
+                Location locb = new Location(tb.getWorld(), tb.getX(), tb.getY() + 1, tb.getZ() + 1);
+                Location locc = new Location(tb.getWorld(), tb.getX(), tb.getY() + 1, tb.getZ());
+                Location locd = new Location(tb.getWorld(), tb.getX() + 1, tb.getY() + 1, tb.getZ());
+                p.getWorld().spawnParticle(Particle.WATER_DROP, loca, 100);
+                p.getWorld().spawnParticle(Particle.WATER_DROP, locb, 100);
+                p.getWorld().spawnParticle(Particle.WATER_DROP, locc, 100);
+                p.getWorld().spawnParticle(Particle.WATER_DROP, locd, 100);
+
                 for (Entity e : org.ah.minecraft.armour.Plugin.getNearbyEntities(loc, 2)) {
                     if ((!e.equals(p)) && ((e instanceof LivingEntity))) {
                         ((LivingEntity) e).damage(4.0D, p);
@@ -52,6 +64,12 @@ public class WaterUtils {
                 }
             }
         }
+    }
+
+    public static ItemStack makeEssence() {
+        ItemStack i = ItemUtils.getCustomItem(Material.INK_SACK, ChatColor.BLUE + "Water Essence", Enchantment.WATER_WORKER);
+        i.setDurability((short) 4);
+        return i;
     }
 
     public static void constantPlayerChecks(Player p) {

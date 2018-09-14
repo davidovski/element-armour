@@ -3,10 +3,12 @@ package org.ah.minecraft.armour.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ah.minecraft.armour.ItemUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -26,6 +28,7 @@ public class AirUtils {
     public static void checkPunch(Player p) {
         if (checkForHelmet(p)) {
             Location loc = p.getLocation();
+            p.getWorld().spawnParticle(Particle.CLOUD, p.getLocation(), 100);
             p.getWorld().playSound(p.getLocation(), org.bukkit.Sound.ENTITY_GHAST_SHOOT, 1.0F, 1.0F);
             for (Entity e : p.getNearbyEntities(3.0D, 3.0D, 3.0D)) {
                 if (!e.equals(p)) {
@@ -43,6 +46,11 @@ public class AirUtils {
                 }
             }
         }
+    }
+
+    public static ItemStack makeEssence() {
+        ItemStack i = ItemUtils.getCustomItem(Material.GHAST_TEAR, ChatColor.YELLOW + "Air Essence", Enchantment.PROTECTION_FALL);
+        return i;
     }
 
     public static void constantPlayerChecks(Player p) {

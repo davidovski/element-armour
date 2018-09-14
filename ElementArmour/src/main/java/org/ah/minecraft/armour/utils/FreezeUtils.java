@@ -7,6 +7,7 @@ import org.ah.minecraft.armour.Plugin;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -35,7 +36,7 @@ public class FreezeUtils {
                 if ((checkForHelmet(p)) && (e.hasAI())) {
                     e.setAI(false);
                     e.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 20, 0), true);
-
+                    p.getWorld().spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 100);
                     e.setGravity(false);
                     org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, new Unfreezemob(e), 20L);
                 }

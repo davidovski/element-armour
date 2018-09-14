@@ -6,10 +6,12 @@ import java.util.ListIterator;
 
 import org.ah.minecraft.armour.utils.AirUtils;
 import org.ah.minecraft.armour.utils.ArmourUtil;
+import org.ah.minecraft.armour.utils.DarkUtils;
 import org.ah.minecraft.armour.utils.EarthUtils;
 import org.ah.minecraft.armour.utils.FireUtils;
 import org.ah.minecraft.armour.utils.IceUtils;
 import org.ah.minecraft.armour.utils.LavaUtils;
+import org.ah.minecraft.armour.utils.LightUtils;
 import org.ah.minecraft.armour.utils.MetalUtils;
 import org.ah.minecraft.armour.utils.SkyUtils;
 import org.ah.minecraft.armour.utils.ToolUtils;
@@ -107,6 +109,82 @@ public class CraftingUtil {
                         }
 
                     }
+
+                    boolean hasEarth = false;
+                    boolean hasFire = false;
+                    boolean hasWater = false;
+                    boolean hasAir = false;
+
+                    int light = 0;
+                    int dark = 0;
+                    for (ItemStack item : inv) {
+
+                        if (ArmourUtil.compare(ArmourUtil.createLightEssence(), item)) {
+                            light++;
+                        }
+
+                        if (ArmourUtil.compare(ArmourUtil.createDarkEssence(), item)) {
+                            dark++;
+                        }
+                        if (ArmourUtil.compare(AirUtils.makeEssence(), item)) {
+                            hasAir = true;
+                        }
+
+                        if (ArmourUtil.compare(EarthUtils.makeEssence(), item)) {
+                            hasEarth = true;
+                        }
+
+                        if (ArmourUtil.compare(FireUtils.makeEssence(), item)) {
+                            hasFire = true;
+                        }
+
+                        if (ArmourUtil.compare(WaterUtils.makeEssence(), item)) {
+                            hasWater = true;
+                        }
+
+
+                    }
+
+                    if (hasAir && hasEarth && hasFire && hasWater && centre != null) {
+                        if (dark == 4) {
+                            if (centre.getType() == Material.DIAMOND_HELMET) {
+                                craft(DarkUtils.createHelmet(), inv, loc);
+                                return;
+                            }
+                            if (centre.getType() == Material.DIAMOND_CHESTPLATE) {
+                                craft(DarkUtils.createChestplate(), inv, loc);
+                                return;
+                            }
+                            if (centre.getType() == Material.DIAMOND_LEGGINGS) {
+                                craft(DarkUtils.createLeggings(), inv, loc);
+                                return;
+                            }
+                            if (centre.getType() == Material.DIAMOND_BOOTS) {
+                                craft(DarkUtils.createBoots(), inv, loc);
+                                return;
+                            }
+                        }
+                        if (light == 4) {
+                            if (centre.getType() == Material.DIAMOND_HELMET) {
+                                craft(LightUtils.createHelmet(), inv, loc);
+                                return;
+                            }
+                            if (centre.getType() == Material.DIAMOND_CHESTPLATE) {
+                                craft(LightUtils.createChestplate(), inv, loc);
+                                return;
+                            }
+                            if (centre.getType() == Material.DIAMOND_LEGGINGS) {
+                                craft(LightUtils.createLeggings(), inv, loc);
+                                return;
+                            }
+                            if (centre.getType() == Material.DIAMOND_BOOTS) {
+                                craft(LightUtils.createBoots(), inv, loc);
+                                return;
+                            }
+                        }
+                    }
+
+
 
                     if (centre != null) {
                         if (centre.getType() == Material.DIAMOND_PICKAXE) {

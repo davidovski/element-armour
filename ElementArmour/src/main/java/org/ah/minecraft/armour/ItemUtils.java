@@ -71,6 +71,14 @@ public class ItemUtils {
         return item;
     }
 
+    public static ItemStack getCustomItem(Material m, String name, Enchantment e) {
+        ItemStack item = getCustomItem(m, name);
+        ItemMeta meta = item.getItemMeta();
+        meta.addEnchant(e, 1, true);
+        item.setItemMeta(meta);
+        return item;
+    }
+
     public static ItemStack getCustomItem(Material m) {
         ItemStack item = new ItemStack(m);
         return item;

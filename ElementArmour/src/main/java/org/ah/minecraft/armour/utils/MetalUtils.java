@@ -208,7 +208,8 @@ public class MetalUtils {
         meta.setDisplayName("Metal Helmet");
 
         List<String> lores = new ArrayList();
-        lores.add(ChatColor.GRAY + "Create metalic fangs by punching!");
+        lores.add(ChatColor.GRAY + "Break metal with your bare hands!");
+        lores.add(ChatColor.GRAY + "Punch out some metal if you are holding anything made from it.");
         lores.add(ChatColor.WHITE + "   ");
         lores.add(ChatColor.GRAY + "Set: " + ChatColor.GREEN + "EARTH");
         lores.add(ChatColor.GRAY + "Tier II");

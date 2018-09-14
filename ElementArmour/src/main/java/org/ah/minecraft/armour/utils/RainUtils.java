@@ -1,8 +1,8 @@
 package org.ah.minecraft.armour.utils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.ah.minecraft.armour.Plugin;
 import org.bukkit.ChatColor;
@@ -34,7 +34,7 @@ public class RainUtils {
     public static void checkPunch(Player p) {
         if (checkForHelmet(p)) {
             p.getWorld().playSound(p.getLocation(), Sound.ENTITY_GENERIC_SPLASH, 1f, 1f);
-            Block tb = p.getTargetBlock((HashSet<Byte>) null, 10);
+            Block tb = p.getTargetBlock((Set<Material>) null, 10);
             Block b1 = new Location(tb.getWorld(), tb.getX(), tb.getY() + 1, tb.getZ()).getBlock();
             Block b2 = new Location(tb.getWorld(), tb.getX(), tb.getY() + 2, tb.getZ()).getBlock();
             Block b3 = new Location(tb.getWorld(), tb.getX(), tb.getY() + 3, tb.getZ()).getBlock();
@@ -51,7 +51,10 @@ public class RainUtils {
             FrostedBlock.setBlock(b6, Material.ICE, 3);
             FrostedBlock.setBlock(b7, Material.ICE, 3);
 
-            for (Entity e : Plugin.getNearbyEntities(b2.getLocation(), 3)) {
+
+
+
+            for (Entity e : Plugin.getNearbyEntities(tb.getLocation(), 3)) {
                 if (!e.equals(p)) {
                     if (e instanceof LivingEntity) {
 

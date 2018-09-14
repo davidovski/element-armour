@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
@@ -35,6 +36,8 @@ public class LightUtils {
     }
 
     public static void onClick(PlayerInteractEntityEvent e) {
+
+
         if (checkForHelmet(e.getPlayer())) {
             if (e.getRightClicked() instanceof LivingEntity) {
                 LivingEntity en = (LivingEntity) e.getRightClicked();
@@ -54,9 +57,15 @@ public class LightUtils {
     }
 
     public static void checkPunch(Player p) {
+        if (checkForBoots(p)) {
+            if (p.isGliding()) {
+//                p.setVelocity(p.getLocation().getDirection().multiply(16));
+            }
+        }
         if (checkForHelmet(p)) {
             Location loc = p.getLocation();
             p.getWorld().playSound(p.getLocation(), Sound.ENTITY_GHAST_SHOOT, 1.0F, 1.0F);
+            p.getWorld().spawnParticle(Particle.END_ROD, p.getLocation(), 1000);
             for (Entity e : p.getNearbyEntities(10.0D, 10.0D, 10.0D)) {
                 if (!e.equals(p)) {
                     Location loc2 = e.getLocation();
@@ -140,19 +149,22 @@ public class LightUtils {
             p.setFallDistance(0);
         }
         if (checkForBoots(p)) {
-            if (p.isSneaking() && p.isGliding()) {
-                p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 1.0F, 1.0F);
-                Vector vec = p.getLocation().getDirection();
-                vec.multiply(1.3f);
-                p.setVelocity(vec);
-            }
+//            if (p.isSneaking() && p.isGliding()) {
+//                p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 1.0F, 1.0F);
+//                Vector vec = p.getLocation().getDirection();
+//                vec.multiply(1.3f);
+//                p.setVelocity(vec);
+//            }
             if (p.isSneaking()) {
                 p.setGliding(true);
                 p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDERDRAGON_FLAP, 1.0F, 1.0F);
-                Vector vec = p.getLocation().getDirection();
-                vec.multiply(1.3f);
+                Vector vec = p.getVelocity().add(p.getLocation().getDirection().multiply(0.2));
+                if (vec.length() > 3) {
+                    vec.multiply(0.9);
+                }
                 p.setVelocity(vec);
             }
+
         }
     }
 
@@ -185,7 +197,7 @@ public class LightUtils {
         boots.setItemMeta(meta);
 
         boots.addUnsafeEnchantment(Enchantment.DURABILITY, 4);
-        boots = ArmourUtil.addArmourAttributes(boots);
+        boots = ArmourUtil.addEpicArmourAttributes(boots);
         return boots;
     }
 

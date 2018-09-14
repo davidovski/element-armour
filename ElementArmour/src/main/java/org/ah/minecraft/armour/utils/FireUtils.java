@@ -3,6 +3,7 @@ package org.ah.minecraft.armour.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ah.minecraft.armour.ItemUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -59,6 +60,11 @@ public class FireUtils {
         if (checkForLeggings(p)) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, 0));
         }
+    }
+
+    public static ItemStack makeEssence() {
+        ItemStack i = ItemUtils.getCustomItem(Material.MAGMA_CREAM, ChatColor.RED + "Fire Essence", Enchantment.FIRE_ASPECT);
+        return i;
     }
 
     public static boolean checkForBoots(Player p) {

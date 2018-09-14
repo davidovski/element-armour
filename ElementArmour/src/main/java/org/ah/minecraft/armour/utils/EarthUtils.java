@@ -3,9 +3,11 @@ package org.ah.minecraft.armour.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ah.minecraft.armour.ItemUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -29,6 +31,7 @@ public class EarthUtils {
     public static void constantPlayerChecks(Player p) {
         if (checkForBoots(p)) {
             if ((!p.isOnGround()) && (p.isSneaking())) {
+                p.getWorld().spawnParticle(Particle.CRIT_MAGIC, p.getLocation(), 10);
                 p.setVelocity(new Vector(0, -2, 0));
                 for (Entity e : p.getNearbyEntities(5.0D, 2.0D, 5.0D)) {
                     if (!e.equals(p)) {
@@ -44,6 +47,11 @@ public class EarthUtils {
         if (checkForLeggings(p)) {
             p.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, 0));
         }
+    }
+
+    public static ItemStack makeEssence() {
+        ItemStack i = ItemUtils.getCustomItem(Material.FLINT, ChatColor.GREEN + "Earth Essence", Enchantment.PROTECTION_EXPLOSIONS);
+        return i;
     }
 
     public static boolean checkForBoots(Player p) {
